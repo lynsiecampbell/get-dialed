@@ -1,3 +1,63 @@
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Plus, X } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
+import { DrawerPanel } from "@/components/ui/DrawerPanel";
+import { showSuccess, showError } from "@/lib/toast-helpers";
+
+interface NewAdMessagingDrawerProps {
+  open: boolean;
+  onClose: () => void;
+  onSuccess?: () => void;
+  campaignId: string;
+}
+
+export function NewAdMessagingDrawer({
+  open,
+  onClose,
+  onSuccess,
+  campaignId,
+}: NewAdMessagingDrawerProps) {
+  const { user } = useAuth();
+  const [loading, setLoading] = useState(false);
+  const [notes, setNotes] = useState("");
+  const [headlines, setHeadlines] = useState<string[]>([""]);
+  const [bodyCopy, setBodyCopy] = useState<string[]>([""]);
+  const [ctas, setCtas] = useState<string[]>([""]);
+
+  const addHeadline = () => setHeadlines([...headlines, ""]);
+  const updateHeadline = (index: number, value: string) => {
+    const updated = [...headlines];
+    updated[index] = value;
+    setHeadlines(updated);
+  };
+  const removeHeadline = (index: number) => {
+    setHeadlines(headlines.filter((_, i) => i !== index));
+  };
+
+  const addBody = () => setBodyCopy([...bodyCopy, ""]);
+  const updateBody = (index: number, value: string) => {
+    const updated = [...bodyCopy];
+    updated[index] = value;
+    setBodyCopy(updated);
+  };
+  const removeBody = (index: number) => {
+    setBodyCopy(bodyCopy.filter((_, i) => i !== index));
+  };
+
+  const addCta = () => setCtas([...ctas, ""]);
+  const updateCta = (index: number, value: string) => {
+    const updated = [...ctas];
+    updated[index] = value;
+    setCtas(updated);
+  };
+  const removeCta = (index: number) => {
+    setCtas(ctas.filter((_, i) => i !== index));
+  };
 
   const handleSave = async () => {
     // Validate at least one of each

@@ -7,6 +7,7 @@ import { AuthProvider } from "./contexts/AuthContext";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 import { Layout } from "./components/Layout";
 import Dashboard from "./pages/Dashboard";
+import Campaigns from "./pages/Campaigns";
 import Ads from "./pages/Ads";
 import CreativeLibrary from "./pages/CreativeLibrary";
 import LandingPageLibrary from "./pages/LandingPageLibrary";
@@ -39,20 +40,21 @@ const App = () => (
               }
             />
             <Route
-              path="/ads"
+              path="/campaigns"
               element={
                 <ProtectedRoute>
                   <Layout>
-                    <Ads />
+                    <Campaigns />
                   </Layout>
                 </ProtectedRoute>
               }
             />
             <Route
-              path="/campaigns"
+              path="/ads"
               element={
                 <ProtectedRoute>
                   <Layout>
+                    <Ads />
                   </Layout>
                 </ProtectedRoute>
               }
