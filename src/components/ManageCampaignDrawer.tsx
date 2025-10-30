@@ -9,48 +9,87 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { supabase } from "@/integrations/supabase/client";
 import { showSuccess, showError } from "@/lib/toast-helpers";
-import { toast } from "sonner";
-import { ChevronDown, Plus, X, Copy, Download, Megaphone, Mail, MessageCircle, Sparkles, Image, Globe, Layers, Link2, LucideIcon, ExternalLink, Play, Trash2, Calendar, Pencil } from "lucide-react";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { 
+  ChevronDown, 
+  Plus, 
+  Trash2, 
+  Pencil,
+  Mail, 
+  Megaphone, 
+  MessageCircle, 
+  Sparkles,
+  Image as ImageIcon,
+  Globe,
+  Layers,
+  Link2
+} from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
-import { MessageFieldCard } from "@/components/shared/MessageFieldCard";
-import { NewAdMessagingDrawer } from "./NewAdMessagingDrawer";
+
+// Import all the "New" drawers
+import { NewBrandMessagingDrawer } from "./NewBrandMessagingDrawer";
 import { NewEmailMessagingDrawer } from "./NewEmailMessagingDrawer";
-import { NewBrandMessagingDrawer } from "./NewBrandMessagingDrawer";
+import { NewAdMessagingDrawer } from "./NewAdMessagingDrawer";
 import { NewSocialMessagingDrawer } from "./NewSocialMessagingDrawer";
-import { NewBrandMessagingDrawer } from "./NewBrandMessagingDrawer";
-import { NewSocialMessagingDrawer } from "./NewSocialMessagingDrawer";
-import { NewBrandMessagingDrawer } from "./NewBrandMessagingDrawer";  id: string;
-import { NewSocialMessagingDrawer } from "./NewSocialMessagingDrawer";
+import { NewCreativeDrawer } from "./NewCreativeDrawer";
+import { NewLandingPageDrawer } from "./NewLandingPageDrawer";
+import { NewAdDrawer } from "./NewAdDrawer";
+
+interface Campaign {
+  id: string;
   name: string;
   type: string | null;
   status: string;
   start_date: string | null;
   end_date: string | null;
-  budget: number | null;
-  spent: number | null;
-  goal: string | null;
   notes: string | null;
 }
 
-interface Asset {
+interface MessagingItem {
   id: string;
-  name?: string;
-  type: 'messaging' | 'creative' | 'landing_page' | 'link' | 'ad';
-  messaging_type?: string;
-  creative_type?: string;
-  status?: string;
-  platform?: string;
-  audience_type?: string;
-  source?: string;
-  medium?: string;
-  thumbnail_url?: string;
-  file_url?: string;
-  url?: string;
+  name: string;
+  messaging_type: string;
   headlines?: string[];
   body_copy?: string[];
   subject_lines?: string[];
   ctas?: string[];
+  notes?: string;
+}
+
+interface Creative {
+  id: string;
+  name: string;
+  creative_type: string;
+  creative_format: string;
+  image_urls?: string[];
+  status: string;
+}
+
+interface LandingPage {
+  id: string;
+  name: string;
+  url: string;
+  description?: string;
+  status: string;
+}
+
+interface Ad {
+  id: string;
+  platform?: string;
+  audience_type?: string;
+  ad_format?: string;
+  status: string;
+  version?: string;
+}
+
+interface Link {
+  id: string;
+  link_name?: string;
+  link_type: string;
+  base_url: string;
+  full_url?: string;
+  utm_source?: string;
+  utm_medium?: string;
+  utm_campaign?: string;
 }
 
 interface ManageCampaignDrawerProps {
@@ -60,15 +99,8 @@ interface ManageCampaignDrawerProps {
   onSuccess?: () => void;
 }
 
-const assetIcons: Record<string, { icon: LucideIcon; color: string }> = {
-  Email: { icon: Mail, color: "text-emerald-600" },
-  Ad: { icon: Megaphone, color: "text-blue-600" },
-  Social: { icon: MessageCircle, color: "text-purple-600" },
-  Brand: { icon: Sparkles, color: "text-amber-600" },
-  Image: { icon: Image, color: "text-cyan-600" },
-  Video: { icon: Play, color: "text-rose-600" },
-  Carousel: { icon: Layers, color: "text-indigo-600" },
-};
+const CAMPAIGN_STATUSES = ["Planning", "Active", "Paused", "Completed", "Archived"];
+const CAMPAIGN_TYPES = ["Evergreen", "Content", "Product", "Promotional", "Event"];
 
 export function ManageCampaignDrawer({
   open,
@@ -77,657 +109,744 @@ export function ManageCampaignDrawer({
   onSuccess,
 }: ManageCampaignDrawerProps) {
   const { user } = useAuth();
-  const [formData, setFormData] = useState<Campaign>({
-    id: "",
-    name: "",
-    type: null,
-    status: "Draft",
-    start_date: null,
-    end_date: null,
-    budget: null,
-    spent: null,
-    goal: null,
-    notes: null,
-  });
 
-  const [assets, setAssets] = useState<{
-    messaging: Asset[];
-    creatives: Asset[];
-    landingPages: Asset[];
-    links: Asset[];
-    ads: Asset[];
-  }>({
-    messaging: [],
-    creatives: [],
-    landingPages: [],
-    links: [],
-    ads: [],
-  });
-
-  const [openSections, setOpenSections] = useState({
-    messaging: true,
-    creatives: true,
-    landingPages: true,
-    links: true,
-    ads: true,
-  });
-
+  // Campaign form data
+  const [name, setName] = useState("");
+  const [type, setType] = useState("");
+  const [status, setStatus] = useState("Planning");
+  const [notes, setNotes] = useState("");
   const [loading, setLoading] = useState(false);
-  const [showAdMessagingDrawer, setShowAdMessagingDrawer] = useState(false);
-  const [showEmailMessagingDrawer, setShowEmailMessagingDrawer] = useState(false);  const [showEmailMessagingDrawer, setShowEmailMessagingDrawer] = useState(false);  useEffect(() => {
-  const [showBrandMessagingDrawer, setShowBrandMessagingDrawer] = useState(false);    if (campaign) {
-  const [showSocialMessagingDrawer, setShowSocialMessagingDrawer] = useState(false);
-      setFormData(campaign);
-      fetchAssets(campaign.id);
-    }
-  }, [campaign]);
 
-  const fetchAssets = async (campaignId: string) => {
+  // Assets state
+  const [messaging, setMessaging] = useState<MessagingItem[]>([]);
+  const [creatives, setCreatives] = useState<Creative[]>([]);
+  const [landingPages, setLandingPages] = useState<LandingPage[]>([]);
+  const [ads, setAds] = useState<Ad[]>([]);
+  const [links, setLinks] = useState<Link[]>([]);
+
+  // Drawer states
+  const [showBrandDrawer, setShowBrandDrawer] = useState(false);
+  const [showEmailDrawer, setShowEmailDrawer] = useState(false);
+  const [showAdMessagingDrawer, setShowAdMessagingDrawer] = useState(false);
+  const [showSocialDrawer, setShowSocialDrawer] = useState(false);
+  const [showCreativeDrawer, setShowCreativeDrawer] = useState(false);
+  const [showLandingPageDrawer, setShowLandingPageDrawer] = useState(false);
+  const [showAdDrawer, setShowAdDrawer] = useState(false);
+
+  // Collapsible states
+  const [brandOpen, setBrandOpen] = useState(false);
+  const [emailOpen, setEmailOpen] = useState(false);
+  const [adMessagingOpen, setAdMessagingOpen] = useState(false);
+  const [socialOpen, setSocialOpen] = useState(false);
+  const [creativesOpen, setCreativesOpen] = useState(false);
+  const [landingPagesOpen, setLandingPagesOpen] = useState(false);
+  const [adsOpen, setAdsOpen] = useState(false);
+  const [linksOpen, setLinksOpen] = useState(false);
+
+  // Load campaign data when drawer opens
+  useEffect(() => {
+    if (campaign && open) {
+      setName(campaign.name);
+      setType(campaign.type || "");
+      setStatus(campaign.status);
+      setNotes(campaign.notes || "");
+      fetchAssets();
+    }
+  }, [campaign, open]);
+
+  const fetchAssets = async () => {
+    if (!campaign) return;
+
     try {
       // Fetch messaging
       const { data: messagingData } = await supabase
         .from("campaign_messaging")
-        .select("messaging:messaging_id(id, messaging_type, name)")
-        .eq("campaign_id", campaignId);
+        .select(`
+          messaging_id,
+          messaging (
+            id,
+            name,
+            messaging_type,
+            headlines,
+            body_copy,
+            subject_lines,
+            ctas,
+            notes
+          )
+        `)
+        .eq("campaign_id", campaign.id);
+
+      if (messagingData) {
+        setMessaging(messagingData.map((m: any) => m.messaging).filter(Boolean));
+      }
 
       // Fetch creatives
       const { data: creativesData } = await supabase
         .from("campaign_creatives")
-        .select("creatives:creative_id(id, name, creative_type, creative_format, image_urls, status)")
-        .eq("campaign_id", campaignId);
+        .select(`
+          creative_id,
+          creatives (
+            id,
+            name,
+            creative_type,
+            creative_format,
+            image_urls,
+            status
+          )
+        `)
+        .eq("campaign_id", campaign.id);
+
+      if (creativesData) {
+        setCreatives(creativesData.map((c: any) => c.creatives).filter(Boolean));
+      }
 
       // Fetch landing pages
-      const { data: landingPagesData } = await supabase
+      const { data: lpData } = await supabase
         .from("campaign_landing_pages")
-        .select("landing_pages:landing_page_id(id, name, url, status)")
-        .eq("campaign_id", campaignId);
+        .select(`
+          landing_page_id,
+          landing_pages (
+            id,
+            name,
+            url,
+            description,
+            status
+          )
+        `)
+        .eq("campaign_id", campaign.id);
+
+      if (lpData) {
+        setLandingPages(lpData.map((lp: any) => lp.landing_pages).filter(Boolean));
+      }
+
+      // Fetch ads
+      const { data: adsData } = await supabase
+        .from("ads")
+        .select("id, platform, audience_type, ad_format, status, version")
+        .eq("campaign_id", campaign.id);
+
+      if (adsData) {
+        setAds(adsData);
+      }
 
       // Fetch manual links
       const { data: linksData } = await supabase
         .from("campaign_links")
         .select(`
-          links:link_id(
+          link_id,
+          links (
             id,
             link_name,
             link_type,
+            base_url,
             full_url,
             utm_source,
             utm_medium,
             utm_campaign
           )
         `)
-        .eq("campaign_id", campaignId);
+        .eq("campaign_id", campaign.id);
 
-      // Fetch ads
-      const { data: adsData } = await supabase
-        .from("ads")
-        .select(`
-          id,
-          ad_name,
-          platform,
-          audience_type,
-          ad_format,
-          status,
-          version,
-          source,
-          medium,
-          creatives:creative_id(thumbnail_url, file_url)
-        `)
-        .eq("campaign_id", campaignId);
-
-      setAssets({
-        messaging: messagingData?.map((m: any) => m.messaging).filter(Boolean) || [],
-        creatives: creativesData?.map((c: any) => c.creatives).filter(Boolean) || [],
-        landingPages: landingPagesData?.map((lp: any) => lp.landing_pages).filter(Boolean) || [],
-        links: linksData?.map((l: any) => l.links).filter(Boolean).filter((l: any) => l.link_type === 'manual') || [],
-        ads: adsData || [],
-      });
+      if (linksData) {
+        setLinks(linksData.map((l: any) => l.links).filter(Boolean));
+      }
     } catch (error) {
       console.error("Error fetching assets:", error);
-      showError("Failed to load campaign assets");
     }
   };
 
-  const handleSubmit = async () => {
-    if (!formData.name.trim()) {
+  const handleSave = async () => {
+    if (!campaign || !user) return;
+
+    if (!name.trim()) {
       showError("Campaign name is required");
       return;
     }
 
+    if (!type) {
+      showError("Campaign type is required");
+      return;
+    }
+
     setLoading(true);
+
     try {
       const { error } = await supabase
         .from("campaigns")
         .update({
-          name: formData.name,
-          type: formData.type,
-          status: formData.status,
-          start_date: formData.start_date,
-          end_date: formData.end_date,
-          budget: formData.budget,
-          goal: formData.goal,
-          notes: formData.notes,
+          name: name.trim(),
+          type,
+          status,
+          notes: notes.trim() || null,
         })
-        .eq("id", campaign!.id);
+        .eq("id", campaign.id);
 
       if (error) throw error;
 
-      showSuccess("Campaign updated successfully");
+      showSuccess("Campaign updated successfully!");
       onSuccess?.();
       onOpenChange(false);
     } catch (error: any) {
-      showError(error.message);
+      console.error("Error updating campaign:", error);
+      showError(error.message || "Failed to update campaign");
     } finally {
       setLoading(false);
     }
   };
 
-  const handleDeleteAsset = async (assetType: string, assetId: string) => {
-    try {
-      let tableName = "";
-      let column = "";
+  const handleDeleteAsset = async (type: string, id: string) => {
+    if (!campaign) return;
 
-      if (assetType === "messaging") {
-        tableName = "campaign_messaging";
-        column = "messaging_id";
-      } else if (assetType === "creatives") {
-        tableName = "campaign_creatives";
-        column = "creative_id";
-      } else if (assetType === "landingPages") {
-        tableName = "campaign_landing_pages";
-        column = "landing_page_id";
-      } else if (assetType === "links") {
-        tableName = "campaign_links";
-        column = "link_id";
-      } else if (assetType === "ads") {
-        const { error } = await supabase.from("ads").delete().eq("id", assetId);
-        if (error) throw error;
-        showSuccess("Ad removed");
-        fetchAssets(campaign!.id);
-        return;
+    try {
+      if (type === "messaging") {
+        await supabase
+          .from("campaign_messaging")
+          .delete()
+          .eq("campaign_id", campaign.id)
+          .eq("messaging_id", id);
+      } else if (type === "creative") {
+        await supabase
+          .from("campaign_creatives")
+          .delete()
+          .eq("campaign_id", campaign.id)
+          .eq("creative_id", id);
+      } else if (type === "landing_page") {
+        await supabase
+          .from("campaign_landing_pages")
+          .delete()
+          .eq("campaign_id", campaign.id)
+          .eq("landing_page_id", id);
+      } else if (type === "ad") {
+        await supabase
+          .from("ads")
+          .delete()
+          .eq("id", id);
+      } else if (type === "link") {
+        await supabase
+          .from("campaign_links")
+          .delete()
+          .eq("campaign_id", campaign.id)
+          .eq("link_id", id);
       }
 
-      const { error } = await supabase
-        .from(tableName)
-        .delete()
-        .eq("campaign_id", campaign!.id)
-        .eq(column, assetId);
-
-      if (error) throw error;
-
       showSuccess("Asset removed from campaign");
-      fetchAssets(campaign!.id);
+      fetchAssets();
     } catch (error: any) {
-      showError(error.message);
+      console.error("Error deleting asset:", error);
+      showError(error.message || "Failed to remove asset");
     }
   };
 
-  const toggleSection = (section: keyof typeof openSections) => {
-    setOpenSections((prev) => ({ ...prev, [section]: !prev[section] }));
-  };
+  // Filter messaging by type
+  const brandMessaging = messaging.filter(m => m.messaging_type === "Brand");
+  const emailMessaging = messaging.filter(m => m.messaging_type === "Email");
+  const adMessaging = messaging.filter(m => m.messaging_type === "Ad");
+  const socialMessaging = messaging.filter(m => m.messaging_type === "Social");
 
-  const getAssetIcon = (asset: Asset) => {
-    const type = asset.messaging_type || asset.creative_type || "default";
-    return assetIcons[type] || { icon: Layers, color: "text-gray-600" };
-  };
+  if (!campaign) return null;
 
   return (
     <DrawerPanel
       open={open}
-      onClose={() => onOpenChange(false)}
+      onOpenChange={onOpenChange}
       title="Manage Campaign"
-      subtitle="Edit campaign details and manage attached assets"
-      footer={
-        <div className="flex justify-end gap-3 w-full">
-          <Button variant="outline" onClick={() => onOpenChange(false)}>
-            Cancel
-          </Button>
-          <Button onClick={handleSubmit} disabled={loading}>
-            {loading ? "Saving..." : "Save Changes"}
-          </Button>
-        </div>
-      }
+      size="lg"
     >
-      <div className="space-y-6">
-        {/* Basic Info */}
+      <div className="space-y-6 p-6">
+        {/* Campaign Details */}
         <div className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="name">Campaign Name</Label>
+            <Label>Campaign Name *</Label>
             <Input
-              id="name"
-              value={formData.name}
-              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-              placeholder="Q4 Product Launch"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              placeholder="Campaign name"
             />
           </div>
 
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="type">Type</Label>
-              <Input
-                id="type"
-                value={formData.type || ""}
-                onChange={(e) => setFormData({ ...formData, type: e.target.value })}
-                placeholder="Launch, Content, etc."
-              />
+              <Label>Type *</Label>
+              <Select value={type} onValueChange={setType}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select type" />
+                </SelectTrigger>
+                <SelectContent>
+                  {CAMPAIGN_TYPES.map((t) => (
+                    <SelectItem key={t} value={t}>
+                      {t}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="status">Status</Label>
-              <Select
-                value={formData.status}
-                onValueChange={(value) => setFormData({ ...formData, status: value })}
-              >
+              <Label>Status</Label>
+              <Select value={status} onValueChange={setStatus}>
                 <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="Draft">Draft</SelectItem>
-                  <SelectItem value="Active">Active</SelectItem>
-                  <SelectItem value="Paused">Paused</SelectItem>
-                  <SelectItem value="Completed">Completed</SelectItem>
-                  <SelectItem value="Archived">Archived</SelectItem>
+                  {CAMPAIGN_STATUSES.map((s) => (
+                    <SelectItem key={s} value={s}>
+                      {s}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="start_date">Start Date</Label>
-              <Input
-                id="start_date"
-                type="date"
-                value={formData.start_date || ""}
-                onChange={(e) => setFormData({ ...formData, start_date: e.target.value })}
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="end_date">End Date</Label>
-              <Input
-                id="end_date"
-                type="date"
-                value={formData.end_date || ""}
-                onChange={(e) => setFormData({ ...formData, end_date: e.target.value })}
-              />
-            </div>
-          </div>
-
           <div className="space-y-2">
-            <Label htmlFor="budget">Budget</Label>
-            <Input
-              id="budget"
-              type="number"
-              value={formData.budget || ""}
-              onChange={(e) => setFormData({ ...formData, budget: parseFloat(e.target.value) || null })}
-              placeholder="5000"
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="goal">Goal</Label>
+            <Label>Notes</Label>
             <Textarea
-              id="goal"
-              value={formData.goal || ""}
-              onChange={(e) => setFormData({ ...formData, goal: e.target.value })}
-              placeholder="Campaign objectives..."
-              rows={3}
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="notes">Notes</Label>
-            <Textarea
-              id="notes"
-              value={formData.notes || ""}
-              onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
-              placeholder="Additional notes..."
-              rows={3}
+              value={notes}
+              onChange={(e) => setNotes(e.target.value)}
+              placeholder="Campaign notes..."
+              className="min-h-[80px]"
             />
           </div>
         </div>
 
-        <div className="h-px bg-border" />
+        {/* Two Column Layout: Messaging | Assets */}
+        <div className="grid grid-cols-2 gap-6">
+          {/* Campaign Messaging */}
+          <div className="space-y-3">
+            <h3 className="font-semibold text-sm">Campaign Messaging</h3>
 
-        {/* Assets Sections */}
-        <div className="space-y-4">
-          <h3 className="font-semibold">Campaign Assets</h3>
-
-          {/* Brand / Campaign Copy */}
-          <div className="space-y-2">
-            <div className="flex items-center justify-between p-3 bg-muted/50 rounded-lg hover:bg-muted/80 transition-colors cursor-pointer"
-                 onClick={() => setShowBrandMessagingDrawer(true)}>
-              <div className="flex items-center gap-2">
-                <Sparkles className="h-4 w-4 text-amber-600" />
-                <span className="font-medium">Brand / Campaign Copy</span>
-                <Badge variant="secondary">{assets.messaging.filter(m => m.messaging_type === 'Brand').length}</Badge>
-              <Button size="sm" variant="ghost">
-                <Plus className="h-4 w-4" />
-              </Button>              </div>
-            </div>
-          </div>
-
-          {/* Email Messaging */}
-          <div className="space-y-2">
-            <div className="flex items-center justify-between p-3 bg-muted/50 rounded-lg hover:bg-muted/80 transition-colors cursor-pointer"
-                 onClick={() => setShowEmailMessagingDrawer(true)}>
-              <div className="flex items-center gap-2">
-                <Mail className="h-4 w-4 text-emerald-600" />
-                <span className="font-medium">Email Messaging</span>
-                <Badge variant="secondary">{assets.messaging.filter(m => m.messaging_type === 'Email').length}</Badge>
-              <Button size="sm" variant="ghost">
-                <Plus className="h-4 w-4" />
-              </Button>              </div>
-            </div>
-          </div>
-
-          {/* Ad Messaging */}
-          <div className="space-y-2">
-            <div className="flex items-center justify-between p-3 bg-muted/50 rounded-lg hover:bg-muted/80 transition-colors cursor-pointer"
-                 onClick={() => setShowAdMessagingDrawer(true)}>
-              <div className="flex items-center gap-2">
-                <Megaphone className="h-4 w-4 text-blue-600" />
-                <span className="font-medium">Ad Messaging</span>
-                <Badge variant="secondary">{assets.messaging.filter(m => m.messaging_type === 'Ad').length}</Badge>
-              </div>
-              <Button size="sm" variant="ghost">
-                <Plus className="h-4 w-4" />
-              </Button>
-            </div>
-          </div>
-
-          {/* Social Messaging */}
-          <div className="space-y-2">
-            <div className="flex items-center justify-between p-3 bg-muted/50 rounded-lg hover:bg-muted/80 transition-colors cursor-pointer"
-                 onClick={() => setShowSocialMessagingDrawer(true)}>
-              <div className="flex items-center gap-2">
-                <MessageCircle className="h-4 w-4 text-purple-600" />
-                <span className="font-medium">Social Messaging</span>
-                <Badge variant="secondary">{assets.messaging.filter(m => m.messaging_type === 'Social').length}</Badge>
-              <Button size="sm" variant="ghost">
-                <Plus className="h-4 w-4" />
-              </Button>
-              </div>
-            </div>
-          </div>
-          {/* Creatives */}
-          <Collapsible open={openSections.creatives} onOpenChange={() => toggleSection("creatives")}>
-            <CollapsibleTrigger className="flex items-center justify-between w-full p-3 bg-muted/50 rounded-lg hover:bg-muted transition-colors">
-              <div className="flex items-center gap-2">
-                <Image className="h-4 w-4 text-cyan-600" />
-                <span className="font-medium">Creatives</span>
-                <Badge variant="secondary">{assets.creatives.length}</Badge>
-              </div>
-              <ChevronDown className={`h-4 w-4 transition-transform ${openSections.creatives ? "rotate-180" : ""}`} />
-            </CollapsibleTrigger>
-            <CollapsibleContent className="pt-3 space-y-2">
-              {assets.creatives.length === 0 ? (
-                <p className="text-sm text-muted-foreground px-3">No creatives attached</p>
-              ) : (
-                assets.creatives.map((creative) => {
-                  const { icon: Icon, color } = getAssetIcon(creative);
-                  const imageUrl = creative.thumbnail_url || creative.file_url || "/placeholder.svg";
-                  return (
-                    <div key={creative.id} className="flex items-center justify-between p-3 border rounded-lg">
-                      <div className="flex items-center gap-3">
-                        <img src={imageUrl} alt={creative.name} className="h-12 w-12 rounded object-cover" />
-                        <div>
-                          <p className="font-medium text-sm">{creative.name}</p>
-                          <div className="flex gap-1 mt-1">
-                            <Badge size="sm" type={creative.creative_type?.toLowerCase() as any}>
-                              {creative.creative_type}
-                            </Badge>
-                            {creative.status && (
-                              <Badge size="sm" status={creative.status.toLowerCase() as any}>
-                                {creative.status}
-                              </Badge>
-                            )}
-                          </div>
-                        </div>
-                      </div>
-                      <Button
-                        size="icon"
-                        variant="ghost"
-                        onClick={() => handleDeleteAsset("creatives", creative.id)}
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  );
-                })
-              )}
-            </CollapsibleContent>
-          </Collapsible>
-
-          {/* Landing Pages */}
-          <Collapsible open={openSections.landingPages} onOpenChange={() => toggleSection("landingPages")}>
-            <CollapsibleTrigger className="flex items-center justify-between w-full p-3 bg-muted/50 rounded-lg hover:bg-muted transition-colors">
-              <div className="flex items-center gap-2">
-                <Globe className="h-4 w-4 text-violet-600" />
-                <span className="font-medium">Landing Pages</span>
-                <Badge variant="secondary">{assets.landingPages.length}</Badge>
-              </div>
-              <ChevronDown className={`h-4 w-4 transition-transform ${openSections.landingPages ? "rotate-180" : ""}`} />
-            </CollapsibleTrigger>
-            <CollapsibleContent className="pt-3 space-y-2">
-              {assets.landingPages.length === 0 ? (
-                <p className="text-sm text-muted-foreground px-3">No landing pages attached</p>
-              ) : (
-                assets.landingPages.map((lp) => (
-                  <div key={lp.id} className="flex items-center justify-between p-3 border rounded-lg">
-                    <div className="flex items-center gap-3">
-                      <Globe className="h-4 w-4 text-violet-600" />
-                      <div>
-                        <p className="font-medium text-sm">{lp.name}</p>
-                        <a
-                          href={lp.url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-xs text-muted-foreground hover:underline flex items-center gap-1"
+            {/* Brand / Campaign Copy */}
+            <Collapsible open={brandOpen} onOpenChange={setBrandOpen}>
+              <div className="border rounded-lg">
+                <div className="flex items-center justify-between p-3 hover:bg-muted/50 transition-colors">
+                  <CollapsibleTrigger className="flex items-center gap-2 flex-1">
+                    <ChevronDown className={`h-4 w-4 transition-transform ${brandOpen ? "" : "-rotate-90"}`} />
+                    <Sparkles className="h-4 w-4 text-amber-600" />
+                    <span className="font-medium text-sm">Brand / Campaign Copy</span>
+                    <Badge variant="secondary" className="ml-auto">{brandMessaging.length}</Badge>
+                  </CollapsibleTrigger>
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setShowBrandDrawer(true);
+                    }}
+                  >
+                    <Plus className="h-4 w-4" />
+                  </Button>
+                </div>
+                <CollapsibleContent>
+                  <div className="p-3 pt-0 space-y-2">
+                    {brandMessaging.map((item) => (
+                      <div key={item.id} className="flex items-center justify-between p-2 bg-muted/30 rounded">
+                        <span className="text-sm">{item.name}</span>
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          onClick={() => handleDeleteAsset("messaging", item.id)}
                         >
-                          {lp.url}
-                          <ExternalLink className="h-3 w-3" />
-                        </a>
+                          <Trash2 className="h-3 w-3" />
+                        </Button>
                       </div>
-                    </div>
-                    <Button
-                      size="icon"
-                      variant="ghost"
-                      onClick={() => handleDeleteAsset("landingPages", lp.id)}
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
+                    ))}
+                    {brandMessaging.length === 0 && (
+                      <p className="text-xs text-muted-foreground">No brand messaging yet</p>
+                    )}
                   </div>
-                ))
-              )}
-            </CollapsibleContent>
-          </Collapsible>
-
-          {/* Links */}
-          <Collapsible open={openSections.links} onOpenChange={() => toggleSection("links")}>
-            <CollapsibleTrigger className="flex items-center justify-between w-full p-3 bg-muted/50 rounded-lg hover:bg-muted transition-colors">
-              <div className="flex items-center gap-2">
-                <Link2 className="h-4 w-4 text-blue-600" />
-                <span className="font-medium">Links</span>
-                <Badge variant="secondary">{assets.links.length}</Badge>
+                </CollapsibleContent>
               </div>
-              <ChevronDown className={`h-4 w-4 transition-transform ${openSections.links ? "rotate-180" : ""}`} />
-            </CollapsibleTrigger>
-            <CollapsibleContent className="pt-3 space-y-2">
-              {assets.links.length === 0 ? (
-                <p className="text-sm text-muted-foreground px-3">No links attached</p>
-              ) : (
-                assets.links.map((link: any) => (
-                  <div key={link.id} className="flex items-center justify-between p-3 border rounded-lg">
-                    <div className="flex items-center gap-3">
-                      <Link2 className="h-4 w-4 text-blue-600" />
-                      <div>
-                        <p className="font-medium text-sm">{link.link_name}</p>
-                        <div className="flex gap-1 mt-1">
-                          {link.utm_source && (
-                            <Badge size="sm" platform={link.utm_source.toLowerCase() as any}>
-                              {link.utm_source}
-                            </Badge>
-                          )}
-                          {link.utm_medium && (
-                            <Badge size="sm" medium={link.utm_medium.toLowerCase().replace(/ /g, '-') as any}>
-                              {link.utm_medium}
-                            </Badge>
-                          )}
-                        </div>
+            </Collapsible>
+
+            {/* Email Messaging */}
+            <Collapsible open={emailOpen} onOpenChange={setEmailOpen}>
+              <div className="border rounded-lg">
+                <div className="flex items-center justify-between p-3 hover:bg-muted/50 transition-colors">
+                  <CollapsibleTrigger className="flex items-center gap-2 flex-1">
+                    <ChevronDown className={`h-4 w-4 transition-transform ${emailOpen ? "" : "-rotate-90"}`} />
+                    <Mail className="h-4 w-4 text-emerald-600" />
+                    <span className="font-medium text-sm">Email Messaging</span>
+                    <Badge variant="secondary" className="ml-auto">{emailMessaging.length}</Badge>
+                  </CollapsibleTrigger>
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setShowEmailDrawer(true);
+                    }}
+                  >
+                    <Plus className="h-4 w-4" />
+                  </Button>
+                </div>
+                <CollapsibleContent>
+                  <div className="p-3 pt-0 space-y-2">
+                    {emailMessaging.map((item) => (
+                      <div key={item.id} className="flex items-center justify-between p-2 bg-muted/30 rounded">
+                        <span className="text-sm">{item.name}</span>
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          onClick={() => handleDeleteAsset("messaging", item.id)}
+                        >
+                          <Trash2 className="h-3 w-3" />
+                        </Button>
                       </div>
-                    </div>
-                    <Button
-                      size="icon"
-                      variant="ghost"
-                      onClick={() => handleDeleteAsset("links", link.id)}
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
+                    ))}
+                    {emailMessaging.length === 0 && (
+                      <p className="text-xs text-muted-foreground">No email messaging yet</p>
+                    )}
                   </div>
-                ))
-              )}
-            </CollapsibleContent>
-          </Collapsible>
-
-          {/* Ads */}
-          <Collapsible open={openSections.ads} onOpenChange={() => toggleSection("ads")}>
-            <CollapsibleTrigger className="flex items-center justify-between w-full p-3 bg-muted/50 rounded-lg hover:bg-muted transition-colors">
-              <div className="flex items-center gap-2">
-                <Megaphone className="h-4 w-4 text-blue-600" />
-                <span className="font-medium">Ads</span>
-                <Badge variant="secondary">{assets.ads.length}</Badge>
+                </CollapsibleContent>
               </div>
-              <ChevronDown className={`h-4 w-4 transition-transform ${openSections.ads ? "rotate-180" : ""}`} />
-            </CollapsibleTrigger>
-            <CollapsibleContent className="pt-3 space-y-2">
-              {assets.ads.length === 0 ? (
-                <p className="text-sm text-muted-foreground px-3">No ads created</p>
-              ) : (
-                assets.ads.map((ad: any) => {
-                  const imageUrl = ad.creatives?.thumbnail_url || ad.creatives?.file_url || "/placeholder.svg";
-                  return (
-                    <div key={ad.id} className="flex items-center gap-3 p-3 border rounded-lg">
-                      <img src={imageUrl} alt="Ad" className="h-16 w-16 rounded object-cover" />
-                      
-                      <div className="flex-1 min-w-0">
-                        <p className="font-medium text-sm truncate">
-                          {ad.ad_name || `${ad.platform} - ${ad.audience_type}`}
-                        </p>
-                        
-                        <div className="flex flex-wrap gap-1 mt-1">
-                          {ad.status && (
-                            <Badge size="sm" status={ad.status.toLowerCase() as any} dot>
-                              {ad.status}
-                            </Badge>
-                          )}
-                          {ad.source && (
-                            <Badge size="sm" platform={ad.source.toLowerCase() as any}>
-                              {ad.source}
-                            </Badge>
-                          )}
-                          {ad.medium && (
-                            <Badge size="sm" medium={ad.medium.toLowerCase().replace(/ /g, '-') as any}>
-                              {ad.medium}
-                            </Badge>
-                          )}
-                        </div>
-                      </div>
+            </Collapsible>
 
-                      <Button
-                        size="icon"
-                        variant="ghost"
-                        onClick={() => handleDeleteAsset("ads", ad.id)}
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  );
-                })
-              )}
-            </CollapsibleContent>
-          </Collapsible>
+            {/* Ad Messaging */}
+            <Collapsible open={adMessagingOpen} onOpenChange={setAdMessagingOpen}>
+              <div className="border rounded-lg">
+                <div className="flex items-center justify-between p-3 hover:bg-muted/50 transition-colors">
+                  <CollapsibleTrigger className="flex items-center gap-2 flex-1">
+                    <ChevronDown className={`h-4 w-4 transition-transform ${adMessagingOpen ? "" : "-rotate-90"}`} />
+                    <Megaphone className="h-4 w-4 text-blue-600" />
+                    <span className="font-medium text-sm">Ad Messaging</span>
+                    <Badge variant="secondary" className="ml-auto">{adMessaging.length}</Badge>
+                  </CollapsibleTrigger>
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setShowAdMessagingDrawer(true);
+                    }}
+                  >
+                    <Plus className="h-4 w-4" />
+                  </Button>
+                </div>
+                <CollapsibleContent>
+                  <div className="p-3 pt-0 space-y-2">
+                    {adMessaging.map((item) => (
+                      <div key={item.id} className="flex items-center justify-between p-2 bg-muted/30 rounded">
+                        <span className="text-sm">{item.name}</span>
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          onClick={() => handleDeleteAsset("messaging", item.id)}
+                        >
+                          <Trash2 className="h-3 w-3" />
+                        </Button>
+                      </div>
+                    ))}
+                    {adMessaging.length === 0 && (
+                      <p className="text-xs text-muted-foreground">No ad messaging yet</p>
+                    )}
+                  </div>
+                </CollapsibleContent>
+              </div>
+            </Collapsible>
+
+            {/* Social Messaging */}
+            <Collapsible open={socialOpen} onOpenChange={setSocialOpen}>
+              <div className="border rounded-lg">
+                <div className="flex items-center justify-between p-3 hover:bg-muted/50 transition-colors">
+                  <CollapsibleTrigger className="flex items-center gap-2 flex-1">
+                    <ChevronDown className={`h-4 w-4 transition-transform ${socialOpen ? "" : "-rotate-90"}`} />
+                    <MessageCircle className="h-4 w-4 text-purple-600" />
+                    <span className="font-medium text-sm">Social Messaging</span>
+                    <Badge variant="secondary" className="ml-auto">{socialMessaging.length}</Badge>
+                  </CollapsibleTrigger>
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setShowSocialDrawer(true);
+                    }}
+                  >
+                    <Plus className="h-4 w-4" />
+                  </Button>
+                </div>
+                <CollapsibleContent>
+                  <div className="p-3 pt-0 space-y-2">
+                    {socialMessaging.map((item) => (
+                      <div key={item.id} className="flex items-center justify-between p-2 bg-muted/30 rounded">
+                        <span className="text-sm">{item.name}</span>
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          onClick={() => handleDeleteAsset("messaging", item.id)}
+                        >
+                          <Trash2 className="h-3 w-3" />
+                        </Button>
+                      </div>
+                    ))}
+                    {socialMessaging.length === 0 && (
+                      <p className="text-xs text-muted-foreground">No social messaging yet</p>
+                    )}
+                  </div>
+                </CollapsibleContent>
+              </div>
+            </Collapsible>
+          </div>
+
+          {/* Campaign Assets */}
+          <div className="space-y-3">
+            <h3 className="font-semibold text-sm">Campaign Assets</h3>
+
+            {/* Creatives */}
+            <Collapsible open={creativesOpen} onOpenChange={setCreativesOpen}>
+              <div className="border rounded-lg">
+                <div className="flex items-center justify-between p-3 hover:bg-muted/50 transition-colors">
+                  <CollapsibleTrigger className="flex items-center gap-2 flex-1">
+                    <ChevronDown className={`h-4 w-4 transition-transform ${creativesOpen ? "" : "-rotate-90"}`} />
+                    <ImageIcon className="h-4 w-4 text-cyan-600" />
+                    <span className="font-medium text-sm">Creatives</span>
+                    <Badge variant="secondary" className="ml-auto">{creatives.length}</Badge>
+                  </CollapsibleTrigger>
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setShowCreativeDrawer(true);
+                    }}
+                  >
+                    <Plus className="h-4 w-4" />
+                  </Button>
+                </div>
+                <CollapsibleContent>
+                  <div className="p-3 pt-0 space-y-2">
+                    {creatives.map((item) => (
+                      <div key={item.id} className="flex items-center justify-between p-2 bg-muted/30 rounded">
+                        <span className="text-sm">{item.name}</span>
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          onClick={() => handleDeleteAsset("creative", item.id)}
+                        >
+                          <Trash2 className="h-3 w-3" />
+                        </Button>
+                      </div>
+                    ))}
+                    {creatives.length === 0 && (
+                      <p className="text-xs text-muted-foreground">No creatives yet</p>
+                    )}
+                  </div>
+                </CollapsibleContent>
+              </div>
+            </Collapsible>
+
+            {/* Landing Pages */}
+            <Collapsible open={landingPagesOpen} onOpenChange={setLandingPagesOpen}>
+              <div className="border rounded-lg">
+                <div className="flex items-center justify-between p-3 hover:bg-muted/50 transition-colors">
+                  <CollapsibleTrigger className="flex items-center gap-2 flex-1">
+                    <ChevronDown className={`h-4 w-4 transition-transform ${landingPagesOpen ? "" : "-rotate-90"}`} />
+                    <Globe className="h-4 w-4 text-blue-600" />
+                    <span className="font-medium text-sm">Landing Pages</span>
+                    <Badge variant="secondary" className="ml-auto">{landingPages.length}</Badge>
+                  </CollapsibleTrigger>
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setShowLandingPageDrawer(true);
+                    }}
+                  >
+                    <Plus className="h-4 w-4" />
+                  </Button>
+                </div>
+                <CollapsibleContent>
+                  <div className="p-3 pt-0 space-y-2">
+                    {landingPages.map((item) => (
+                      <div key={item.id} className="flex items-center justify-between p-2 bg-muted/30 rounded">
+                        <span className="text-sm">{item.name}</span>
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          onClick={() => handleDeleteAsset("landing_page", item.id)}
+                        >
+                          <Trash2 className="h-3 w-3" />
+                        </Button>
+                      </div>
+                    ))}
+                    {landingPages.length === 0 && (
+                      <p className="text-xs text-muted-foreground">No landing pages yet</p>
+                    )}
+                  </div>
+                </CollapsibleContent>
+              </div>
+            </Collapsible>
+
+            {/* Ads */}
+            <Collapsible open={adsOpen} onOpenChange={setAdsOpen}>
+              <div className="border rounded-lg">
+                <div className="flex items-center justify-between p-3 hover:bg-muted/50 transition-colors">
+                  <CollapsibleTrigger className="flex items-center gap-2 flex-1">
+                    <ChevronDown className={`h-4 w-4 transition-transform ${adsOpen ? "" : "-rotate-90"}`} />
+                    <Layers className="h-4 w-4 text-orange-600" />
+                    <span className="font-medium text-sm">Ads</span>
+                    <Badge variant="secondary" className="ml-auto">{ads.length}</Badge>
+                  </CollapsibleTrigger>
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setShowAdDrawer(true);
+                    }}
+                  >
+                    <Plus className="h-4 w-4" />
+                  </Button>
+                </div>
+                <CollapsibleContent>
+                  <div className="p-3 pt-0 space-y-2">
+                    {ads.map((item) => (
+                      <div key={item.id} className="flex items-center justify-between p-2 bg-muted/30 rounded">
+                        <span className="text-sm">{item.platform} - {item.audience_type}</span>
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          onClick={() => handleDeleteAsset("ad", item.id)}
+                        >
+                          <Trash2 className="h-3 w-3" />
+                        </Button>
+                      </div>
+                    ))}
+                    {ads.length === 0 && (
+                      <p className="text-xs text-muted-foreground">No ads yet</p>
+                    )}
+                  </div>
+                </CollapsibleContent>
+              </div>
+            </Collapsible>
+
+            {/* Links */}
+            <Collapsible open={linksOpen} onOpenChange={setLinksOpen}>
+              <div className="border rounded-lg">
+                <div className="flex items-center justify-between p-3 hover:bg-muted/50 transition-colors">
+                  <CollapsibleTrigger className="flex items-center gap-2 flex-1">
+                    <ChevronDown className={`h-4 w-4 transition-transform ${linksOpen ? "" : "-rotate-90"}`} />
+                    <Link2 className="h-4 w-4 text-green-600" />
+                    <span className="font-medium text-sm">Links</span>
+                    <Badge variant="secondary" className="ml-auto">{links.length}</Badge>
+                  </CollapsibleTrigger>
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    disabled
+                  >
+                    <Plus className="h-4 w-4" />
+                  </Button>
+                </div>
+                <CollapsibleContent>
+                  <div className="p-3 pt-0 space-y-2">
+                    {links.map((item) => (
+                      <div key={item.id} className="flex items-center justify-between p-2 bg-muted/30 rounded">
+                        <span className="text-sm truncate">{item.link_name || item.base_url}</span>
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          onClick={() => handleDeleteAsset("link", item.id)}
+                        >
+                          <Trash2 className="h-3 w-3" />
+                        </Button>
+                      </div>
+                    ))}
+                    {links.length === 0 && (
+                      <p className="text-xs text-muted-foreground">No links yet</p>
+                    )}
+                  </div>
+                </CollapsibleContent>
+              </div>
+            </Collapsible>
+          </div>
+        </div>
+
+        {/* Actions */}
+        <div className="flex justify-end gap-2 pt-4 border-t">
+          <Button variant="outline" onClick={() => onOpenChange(false)}>
+            Cancel
+          </Button>
+          <Button onClick={handleSave} disabled={loading}>
+            {loading ? "Saving..." : "Save Changes"}
+          </Button>
         </div>
       </div>
 
-      {/* NewAdMessagingDrawer */}
+      {/* All the "New" drawers */}
       {campaign && (
-        <NewAdMessagingDrawer
-          open={showAdMessagingDrawer}
-          onClose={() => setShowAdMessagingDrawer(false)}
-          onSuccess={() => {
-            setShowAdMessagingDrawer(false);
-            fetchAssets();
-          }}
-          campaignId={campaign.id}
-        />
+        <>
+          <NewBrandMessagingDrawer
+            open={showBrandDrawer}
+            onClose={() => setShowBrandDrawer(false)}
+            onSuccess={() => {
+              setShowBrandDrawer(false);
+              fetchAssets();
+            }}
+            campaignId={campaign.id}
+          />
 
-      {/* NewEmailMessagingDrawer */}
-      {campaign && (
-        <NewEmailMessagingDrawer
-          open={showEmailMessagingDrawer}
-          onClose={() => setShowEmailMessagingDrawer(false)}
-          onSuccess={() => {
-            setShowEmailMessagingDrawer(false);
-            fetchAssets();
-          }}
-          campaignId={campaign.id}
-        />
-      )}
+          <NewEmailMessagingDrawer
+            open={showEmailDrawer}
+            onClose={() => setShowEmailDrawer(false)}
+            onSuccess={() => {
+              setShowEmailDrawer(false);
+              fetchAssets();
+            }}
+            campaignId={campaign.id}
+          />
 
-      {/* NewBrandMessagingDrawer */}
-      {campaign && (
-        <NewBrandMessagingDrawer
-          open={showBrandMessagingDrawer}
-          onClose={() => setShowBrandMessagingDrawer(false)}
-          onSuccess={() => {
-            setShowBrandMessagingDrawer(false);
-            fetchAssets();
-          }}
-          campaignId={campaign.id}
-        />
-      )}
+          <NewAdMessagingDrawer
+            open={showAdMessagingDrawer}
+            onClose={() => setShowAdMessagingDrawer(false)}
+            onSuccess={() => {
+              setShowAdMessagingDrawer(false);
+              fetchAssets();
+            }}
+            campaignId={campaign.id}
+          />
 
-      )}
+          <NewSocialMessagingDrawer
+            open={showSocialDrawer}
+            onClose={() => setShowSocialDrawer(false)}
+            onSuccess={() => {
+              setShowSocialDrawer(false);
+              fetchAssets();
+            }}
+            campaignId={campaign.id}
+          />
 
-      {/* NewEmailMessagingDrawer */}
-      {campaign && (
-        <NewEmailMessagingDrawer
-          open={showEmailMessagingDrawer}
-          onClose={() => setShowEmailMessagingDrawer(false)}
-          onSuccess={() => {
-            setShowEmailMessagingDrawer(false);
-            fetchAssets();
-          }}
-          campaignId={campaign.id}
-        />
-      )}
+          <NewCreativeDrawer
+            open={showCreativeDrawer}
+            onClose={() => setShowCreativeDrawer(false)}
+            onSuccess={() => {
+              setShowCreativeDrawer(false);
+              fetchAssets();
+            }}
+            campaignId={campaign.id}
+          />
 
-      {/* NewBrandMessagingDrawer */}
+          <NewLandingPageDrawer
+            open={showLandingPageDrawer}
+            onClose={() => setShowLandingPageDrawer(false)}
+            onSuccess={() => {
+              setShowLandingPageDrawer(false);
+              fetchAssets();
+            }}
+            campaignId={campaign.id}
+          />
 
-      {/* NewSocialMessagingDrawer */}
-      {campaign && (
-        <NewSocialMessagingDrawer
-          open={showSocialMessagingDrawer}
-          onClose={() => setShowSocialMessagingDrawer(false)}
-          onSuccess={() => {
-            setShowSocialMessagingDrawer(false);
-            fetchAssets();
-          }}
-          campaignId={campaign.id}
-        />
-      )}
-      {campaign && (
-        <NewBrandMessagingDrawer
-          open={showBrandMessagingDrawer}
-          onClose={() => setShowBrandMessagingDrawer(false)}
-          onSuccess={() => {
-            setShowBrandMessagingDrawer(false);
-            fetchAssets();
-          }}
-          campaignId={campaign.id}
-        />
+          <NewAdDrawer
+            open={showAdDrawer}
+            onClose={() => setShowAdDrawer(false)}
+            onSuccess={() => {
+              setShowAdDrawer(false);
+              fetchAssets();
+            }}
+            campaignId={campaign.id}
+          />
+        </>
       )}
     </DrawerPanel>
   );
