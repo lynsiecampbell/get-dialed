@@ -15,8 +15,13 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/comp
 import { useAuth } from "@/contexts/AuthContext";
 import { MessageFieldCard } from "@/components/shared/MessageFieldCard";
 import { NewAdMessagingDrawer } from "./NewAdMessagingDrawer";
-interface Campaign {
-  id: string;
+import { NewEmailMessagingDrawer } from "./NewEmailMessagingDrawer";
+import { NewBrandMessagingDrawer } from "./NewBrandMessagingDrawer";
+import { NewSocialMessagingDrawer } from "./NewSocialMessagingDrawer";
+import { NewBrandMessagingDrawer } from "./NewBrandMessagingDrawer";
+import { NewSocialMessagingDrawer } from "./NewSocialMessagingDrawer";
+import { NewBrandMessagingDrawer } from "./NewBrandMessagingDrawer";  id: string;
+import { NewSocialMessagingDrawer } from "./NewSocialMessagingDrawer";
   name: string;
   type: string | null;
   status: string;
@@ -109,8 +114,9 @@ export function ManageCampaignDrawer({
 
   const [loading, setLoading] = useState(false);
   const [showAdMessagingDrawer, setShowAdMessagingDrawer] = useState(false);
-  useEffect(() => {
-    if (campaign) {
+  const [showEmailMessagingDrawer, setShowEmailMessagingDrawer] = useState(false);  const [showEmailMessagingDrawer, setShowEmailMessagingDrawer] = useState(false);  useEffect(() => {
+  const [showBrandMessagingDrawer, setShowBrandMessagingDrawer] = useState(false);    if (campaign) {
+  const [showSocialMessagingDrawer, setShowSocialMessagingDrawer] = useState(false);
       setFormData(campaign);
       fetchAssets(campaign.id);
     }
@@ -390,23 +396,29 @@ export function ManageCampaignDrawer({
 
           {/* Brand / Campaign Copy */}
           <div className="space-y-2">
-            <div className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
+            <div className="flex items-center justify-between p-3 bg-muted/50 rounded-lg hover:bg-muted/80 transition-colors cursor-pointer"
+                 onClick={() => setShowBrandMessagingDrawer(true)}>
               <div className="flex items-center gap-2">
                 <Sparkles className="h-4 w-4 text-amber-600" />
                 <span className="font-medium">Brand / Campaign Copy</span>
                 <Badge variant="secondary">{assets.messaging.filter(m => m.messaging_type === 'Brand').length}</Badge>
-              </div>
+              <Button size="sm" variant="ghost">
+                <Plus className="h-4 w-4" />
+              </Button>              </div>
             </div>
           </div>
 
           {/* Email Messaging */}
           <div className="space-y-2">
-            <div className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
+            <div className="flex items-center justify-between p-3 bg-muted/50 rounded-lg hover:bg-muted/80 transition-colors cursor-pointer"
+                 onClick={() => setShowEmailMessagingDrawer(true)}>
               <div className="flex items-center gap-2">
                 <Mail className="h-4 w-4 text-emerald-600" />
                 <span className="font-medium">Email Messaging</span>
                 <Badge variant="secondary">{assets.messaging.filter(m => m.messaging_type === 'Email').length}</Badge>
-              </div>
+              <Button size="sm" variant="ghost">
+                <Plus className="h-4 w-4" />
+              </Button>              </div>
             </div>
           </div>
 
@@ -427,11 +439,15 @@ export function ManageCampaignDrawer({
 
           {/* Social Messaging */}
           <div className="space-y-2">
-            <div className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
+            <div className="flex items-center justify-between p-3 bg-muted/50 rounded-lg hover:bg-muted/80 transition-colors cursor-pointer"
+                 onClick={() => setShowSocialMessagingDrawer(true)}>
               <div className="flex items-center gap-2">
                 <MessageCircle className="h-4 w-4 text-purple-600" />
                 <span className="font-medium">Social Messaging</span>
                 <Badge variant="secondary">{assets.messaging.filter(m => m.messaging_type === 'Social').length}</Badge>
+              <Button size="sm" variant="ghost">
+                <Plus className="h-4 w-4" />
+              </Button>
               </div>
             </div>
           </div>
@@ -642,6 +658,72 @@ export function ManageCampaignDrawer({
           onClose={() => setShowAdMessagingDrawer(false)}
           onSuccess={() => {
             setShowAdMessagingDrawer(false);
+            fetchAssets();
+          }}
+          campaignId={campaign.id}
+        />
+
+      {/* NewEmailMessagingDrawer */}
+      {campaign && (
+        <NewEmailMessagingDrawer
+          open={showEmailMessagingDrawer}
+          onClose={() => setShowEmailMessagingDrawer(false)}
+          onSuccess={() => {
+            setShowEmailMessagingDrawer(false);
+            fetchAssets();
+          }}
+          campaignId={campaign.id}
+        />
+      )}
+
+      {/* NewBrandMessagingDrawer */}
+      {campaign && (
+        <NewBrandMessagingDrawer
+          open={showBrandMessagingDrawer}
+          onClose={() => setShowBrandMessagingDrawer(false)}
+          onSuccess={() => {
+            setShowBrandMessagingDrawer(false);
+            fetchAssets();
+          }}
+          campaignId={campaign.id}
+        />
+      )}
+
+      )}
+
+      {/* NewEmailMessagingDrawer */}
+      {campaign && (
+        <NewEmailMessagingDrawer
+          open={showEmailMessagingDrawer}
+          onClose={() => setShowEmailMessagingDrawer(false)}
+          onSuccess={() => {
+            setShowEmailMessagingDrawer(false);
+            fetchAssets();
+          }}
+          campaignId={campaign.id}
+        />
+      )}
+
+      {/* NewBrandMessagingDrawer */}
+
+      {/* NewSocialMessagingDrawer */}
+      {campaign && (
+        <NewSocialMessagingDrawer
+          open={showSocialMessagingDrawer}
+          onClose={() => setShowSocialMessagingDrawer(false)}
+          onSuccess={() => {
+            setShowSocialMessagingDrawer(false);
+            fetchAssets();
+          }}
+          campaignId={campaign.id}
+        />
+      )}
+      {campaign && (
+        <NewBrandMessagingDrawer
+          open={showBrandMessagingDrawer}
+          onClose={() => setShowBrandMessagingDrawer(false)}
+          onSuccess={() => {
+            setShowBrandMessagingDrawer(false);
             fetchAssets();
           }}
           campaignId={campaign.id}
