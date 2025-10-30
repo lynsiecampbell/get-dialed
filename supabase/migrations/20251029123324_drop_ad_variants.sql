@@ -1,0 +1,2 @@
+DROP TABLE IF EXISTS ad_variants CASCADE;
+ALTER TABLE ads DROP COLUMN IF EXISTS ad_variant_id;

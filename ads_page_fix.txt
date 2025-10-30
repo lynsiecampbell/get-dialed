@@ -1,0 +1,27 @@
+Find this section (around line 510):
+
+          return { 
+            ...ad,
+            campaign: ad.campaigns?.name || '', // Extract campaign name from join
+            attached_creatives, 
+            landing_page_name,
+            status: ad.status as "Active" | "Draft" | "Paused" | "Archived" 
+          };
+
+Replace with:
+
+          // Extract actual messaging text using indices
+          const headline = ad.messaging?.headlines?.[ad.headline_index] || ad.headline || null;
+          const body = ad.messaging?.body_copy?.[ad.body_copy_index] || ad.body || null;
+          const cta = ad.messaging?.ctas?.[ad.cta_index] || ad.cta_label || null;
+
+          return { 
+            ...ad,
+            campaign: ad.campaigns?.name || '', // Extract campaign name from join
+            attached_creatives, 
+            landing_page_name,
+            status: ad.status as "Active" | "Draft" | "Paused" | "Archived",
+            headline,
+            body,
+            cta_label: cta
+          };

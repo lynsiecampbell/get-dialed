@@ -1,0 +1,526 @@
+import { useState, useEffect } from "react";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { DrawerSmall } from "@/components/shared/DrawerSmall";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
+import { toast } from "sonner";
+import { Trash2, Upload, Image as ImageIcon, Film, Check, ChevronsUpDown } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Progress } from "@/components/ui/progress";
+import { cn } from "@/lib/utils";
+
+interface NewCreativeDrawerProps {
+  open: boolean;
+  onClose: () => void;
+  onSuccess?: (creative?: any) => void;
+  contextCampaign?: string;
+}
+
+type FilePreview = {
+  file: File;
+  previewUrl: string;
+  name: string;
+  type: string;
+  size: string;
+};
+
+type UploadProgress = {
+  fileName: string;
+  progress: number;
+  status: 'pending' | 'uploading' | 'success' | 'error';
+};
+
+export function NewCreativeDrawer({
+  open,
+  onClose,
+  onSuccess,
+  contextCampaign
+}: NewCreativeDrawerProps) {
+  const { user } = useAuth();
+  const [files, setFiles] = useState<FilePreview[]>([]);
+  const [externalUrl, setExternalUrl] = useState("");
+  const [selectedCampaigns, setSelectedCampaigns] = useState<string[]>(contextCampaign ? [contextCampaign] : []);
+  const [notes, setNotes] = useState("");
+  const [campaigns, setCampaigns] = useState<{ id: string; name: string }[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState<UploadProgress[]>([]);
+  const [isUploading, setIsUploading] = useState(false);
+
+  useEffect(() => {
+    if (open) {
+      fetchCampaigns();
+      if (contextCampaign) {
+        setSelectedCampaigns([contextCampaign]);
+      }
+    }
+  }, [open, contextCampaign]);
+
+  const fetchCampaigns = async () => {
+    try {
+      const { data } = await supabase
+        .from("campaigns")
+        .select("id, name")
+        .eq("user_id", user?.id)
+        .order("name");
+      
+      setCampaigns(data || []);
+    } catch (error) {
+      console.error("Error fetching campaigns:", error);
+    }
+  };
+
+  const formatFileName = (name: string): string => {
+    const nameWithoutExt = name.replace(/\.[^/.]+$/, "");
+    const withSpaces = nameWithoutExt.replace(/[_-]/g, " ");
+    return withSpaces
+      .split(" ")
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+      .join(" ");
+  };
+
+  const formatFileSize = (bytes: number): string => {
+    if (bytes === 0) return '0 Bytes';
+    const k = 1024;
+    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return Math.round(bytes / Math.pow(k, i) * 100) / 100 + ' ' + sizes[i];
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const selectedFiles = Array.from(e.target.files || []);
+    const newPreviews: FilePreview[] = selectedFiles.map(file => {
+      const previewUrl = URL.createObjectURL(file);
+      const fileType = file.type.startsWith("image/") ? "Image" : 
+                       file.type.startsWith("video/") ? "Video" : "Other";
+      
+      return {
+        file,
+        previewUrl,
+        name: formatFileName(file.name),
+        type: fileType,
+        size: formatFileSize(file.size)
+      };
+    });
+    
+    setFiles(prev => [...prev, ...newPreviews]);
+  };
+
+  const handleRemoveFile = (index: number) => {
+    setFiles(prev => {
+      const newFiles = [...prev];
+      URL.revokeObjectURL(newFiles[index].previewUrl);
+      newFiles.splice(index, 1);
+      return newFiles;
+    });
+  };
+
+  const uploadFile = async (file: File): Promise<string> => {
+    const fileExt = file.name.split(".").pop();
+    const fileName = `${user?.id}/${Date.now()}.${fileExt}`;
+    const { error: uploadError } = await supabase.storage
+      .from("creative-images")
+      .upload(fileName, file, {
+        cacheControl: "3600",
+        upsert: false
+      });
+
+    if (uploadError) throw uploadError;
+
+    const { data: urlData } = supabase.storage
+      .from("creative-images")
+      .getPublicUrl(fileName);
+    return urlData.publicUrl;
+  };
+
+  const detectFileMetadata = (file: File) => {
+    const isImage = file.type.startsWith("image/");
+    const isVideo = file.type.startsWith("video/");
+    const creativeType = isImage ? "Single Image" : isVideo ? "Video" : "Other";
+    const fileSizeMB = file.size / (1024 * 1024);
+    return {
+      creativeType,
+      fileSizeMB: parseFloat(fileSizeMB.toFixed(2)),
+      mimeType: file.type
+    };
+  };
+
+  const handleCampaignToggle = (campaignName: string) => {
+    setSelectedCampaigns(prev => 
+      prev.includes(campaignName)
+        ? prev.filter(c => c !== campaignName)
+        : [...prev, campaignName]
+    );
+  };
+
+  const handleSave = async () => {
+    if (files.length === 0 && !externalUrl) {
+      toast.error("Please upload at least one file or enter a URL");
+      return;
+    }
+
+    setLoading(true);
+    setIsUploading(true);
+    
+    try {
+      const createdCreatives = [];
+
+      // Handle external URL
+      if (externalUrl && files.length === 0) {
+        setUploadProgress([{ fileName: 'External URL', progress: 50, status: 'uploading' }]);
+        
+        const { data, error } = await supabase.from("creatives").insert({
+          user_id: user?.id,
+          creative_name: "External Creative",
+          creative_type: "Other",
+          file_url: externalUrl,
+          thumbnail_url: externalUrl,
+          file_size_mb: 0,
+          mime_type: "",
+          tags: [],
+          notes,
+          status: "Unassigned"
+        }).select().single();
+
+        if (error) throw error;
+        createdCreatives.push(data);
+        setUploadProgress([{ fileName: 'External URL', progress: 100, status: 'success' }]);
+      }
+
+      // Initialize progress tracking
+      const initialProgress: UploadProgress[] = files.map(f => ({
+        fileName: f.name,
+        progress: 0,
+        status: 'pending' as const
+      }));
+      setUploadProgress(initialProgress);
+
+      // Handle file uploads
+      for (let i = 0; i < files.length; i++) {
+        const filePreview = files[i];
+        const file = filePreview.file;
+        
+        // Update status to uploading
+        setUploadProgress(prev => prev.map((p, idx) => 
+          idx === i ? { ...p, progress: 10, status: 'uploading' } : p
+        ));
+
+        if (file.size > 50 * 1024 * 1024) {
+          setUploadProgress(prev => prev.map((p, idx) => 
+            idx === i ? { ...p, progress: 100, status: 'error' } : p
+          ));
+          toast.error(`${file.name}: File size must be less than 50MB`);
+          continue;
+        }
+
+        try {
+          // Upload file (40% progress)
+          setUploadProgress(prev => prev.map((p, idx) => 
+            idx === i ? { ...p, progress: 40 } : p
+          ));
+          const fileUrl = await uploadFile(file);
+          
+          // Detect metadata (60% progress)
+          setUploadProgress(prev => prev.map((p, idx) => 
+            idx === i ? { ...p, progress: 60 } : p
+          ));
+          const metadata = detectFileMetadata(file);
+          
+          // Create database record (80% progress)
+          setUploadProgress(prev => prev.map((p, idx) => 
+            idx === i ? { ...p, progress: 80 } : p
+          ));
+          
+          const { data, error } = await supabase.from("creatives").insert({
+            user_id: user?.id,
+            creative_name: filePreview.name,
+            creative_type: metadata.creativeType,
+            file_url: fileUrl,
+            thumbnail_url: fileUrl,
+            file_size_mb: metadata.fileSizeMB,
+            mime_type: metadata.mimeType,
+            tags: [],
+            notes,
+            status: selectedCampaigns.length > 0 ? "Assigned" : "Unassigned"
+          }).select().single();
+
+          if (error) throw error;
+          createdCreatives.push(data);
+          
+          // Complete (100% progress)
+          setUploadProgress(prev => prev.map((p, idx) => 
+            idx === i ? { ...p, progress: 100, status: 'success' } : p
+          ));
+        } catch (error) {
+          setUploadProgress(prev => prev.map((p, idx) => 
+            idx === i ? { ...p, progress: 100, status: 'error' } : p
+          ));
+          throw error;
+        }
+      }
+
+      // Link creatives to campaigns using campaign_creatives junction table
+      if (selectedCampaigns.length > 0 && createdCreatives.length > 0) {
+        // Get campaign IDs from campaign names
+        const { data: campaignData } = await supabase
+          .from("campaigns")
+          .select("id, name")
+          .in("name", selectedCampaigns)
+          .eq("user_id", user!.id);
+
+        if (campaignData && campaignData.length > 0) {
+          // Create junction records for each creative-campaign combination
+          const junctionRecords = [];
+          for (const creative of createdCreatives) {
+            for (const campaign of campaignData) {
+              junctionRecords.push({
+                campaign_id: campaign.id,
+                creative_id: creative.id
+              });
+            }
+          }
+
+          const { error: junctionError } = await supabase
+            .from("campaign_creatives")
+            .insert(junctionRecords);
+
+          if (junctionError) throw junctionError;
+        }
+      }
+
+      const successMsg = createdCreatives.length === 1 
+        ? "✅ 1 creative uploaded successfully"
+        : `✅ ${createdCreatives.length} creatives uploaded successfully`;
+      toast.success(successMsg);
+      
+      resetForm();
+      onSuccess?.();
+      
+      // Auto-close after 2 seconds
+      setTimeout(() => {
+        onClose();
+        setIsUploading(false);
+      }, 2000);
+    } catch (error: any) {
+      toast.error(error.message);
+      setIsUploading(false);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const resetForm = () => {
+    files.forEach(f => URL.revokeObjectURL(f.previewUrl));
+    setFiles([]);
+    setExternalUrl("");
+    setSelectedCampaigns(contextCampaign ? [contextCampaign] : []);
+    setNotes("");
+    setUploadProgress([]);
+  };
+
+  const handleClose = () => {
+    resetForm();
+    onClose();
+  };
+
+  return (
+    <DrawerSmall
+      isOpen={open}
+      onClose={handleClose}
+      title="Add New Creatives"
+      description="Upload multiple files or add an external URL"
+      onSave={handleSave}
+      saveText={loading ? "Uploading..." : "Save"}
+      isLoading={loading}
+    >
+      <div className="space-y-4">
+        {/* Upload Section */}
+        <div className="space-y-2">
+          <Label className="text-sm font-medium">
+            Files or URL <span className="text-red-500">*</span>
+          </Label>
+          <div className="space-y-2">
+            <label className="block">
+              <div className="border-2 border-dashed border-gray-300 rounded-md p-8 hover:bg-gray-50 transition-colors cursor-pointer text-center">
+                <Upload className="w-6 h-6 mx-auto mb-2 text-gray-400" />
+                <p className="text-sm text-gray-600">
+                  Click to upload or drag and drop
+                </p>
+                <p className="text-xs text-gray-500 mt-1">
+                  Images and videos up to 50MB
+                </p>
+              </div>
+              <Input
+                type="file"
+                accept=".jpg,.jpeg,.png,.gif,.mp4,.mov,.webp"
+                onChange={handleFileChange}
+                className="hidden"
+                multiple
+                disabled={isUploading || !!externalUrl}
+              />
+            </label>
+            
+            <div className="relative">
+              <div className="absolute inset-0 flex items-center">
+                <span className="w-full border-t" />
+              </div>
+              <div className="relative flex justify-center text-xs uppercase">
+                <span className="bg-background px-2 text-muted-foreground">Or</span>
+              </div>
+            </div>
+            
+            <Input
+              value={externalUrl}
+              onChange={(e) => setExternalUrl(e.target.value)}
+              placeholder="Paste external URL"
+              disabled={files.length > 0 || isUploading}
+              className="h-10 rounded-sm"
+            />
+          </div>
+        </div>
+
+        {/* File Preview List */}
+        {files.length > 0 && !isUploading && (
+          <div className="space-y-2">
+            <Label className="text-sm font-medium">
+              Selected Files ({files.length})
+            </Label>
+            <div className="space-y-2 max-h-64 overflow-y-auto border rounded-sm p-2">
+              {files.map((filePreview, index) => (
+                <div
+                  key={index}
+                  className="flex items-center gap-3 p-2 rounded-sm bg-muted/50 hover:bg-muted transition-colors"
+                >
+                  <div className="w-16 h-16 rounded overflow-hidden bg-background border flex-shrink-0 flex items-center justify-center">
+                    {filePreview.type === "Image" ? (
+                      <img
+                        src={filePreview.previewUrl}
+                        alt={filePreview.name}
+                        className="w-full h-full object-cover"
+                      />
+                    ) : filePreview.type === "Video" ? (
+                      <Film className="w-8 h-8 text-muted-foreground" />
+                    ) : (
+                      <ImageIcon className="w-8 h-8 text-muted-foreground" />
+                    )}
+                  </div>
+                  
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium truncate">
+                      {filePreview.name}
+                    </p>
+                    <p className="text-xs text-muted-foreground">
+                      {filePreview.type} • {filePreview.size}
+                    </p>
+                  </div>
+                  
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => handleRemoveFile(index)}
+                    className="flex-shrink-0 h-10 w-10"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </Button>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Upload Progress */}
+        {isUploading && uploadProgress.length > 0 && (
+          <div className="space-y-2">
+            <Label className="text-sm font-medium">Upload Progress</Label>
+            <div className="space-y-3">
+              {uploadProgress.map((progress, index) => (
+                <div key={index} className="space-y-1">
+                  <div className="flex justify-between text-sm">
+                    <span className="truncate flex-1">{progress.fileName}</span>
+                    <span className="text-muted-foreground ml-2">
+                      {progress.status === 'success' && '✓'}
+                      {progress.status === 'error' && '✗'}
+                      {progress.status === 'uploading' && `${progress.progress}%`}
+                    </span>
+                  </div>
+                  <Progress value={progress.progress} className="h-1" />
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Campaign Selection */}
+        <div className="space-y-2">
+          <Label className="text-sm font-medium">Campaigns (Optional)</Label>
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button
+                variant="outline"
+                role="combobox"
+                className="w-full h-10 justify-between font-normal rounded-sm"
+                disabled={isUploading}
+              >
+                {selectedCampaigns.length > 0
+                  ? `${selectedCampaigns.length} campaign${selectedCampaigns.length !== 1 ? 's' : ''} selected`
+                  : 'Select campaigns...'}
+                <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent 
+              className="w-[436px] p-0 pointer-events-auto" 
+              align="start"
+            >
+              <div className="max-h-64 overflow-y-auto p-2">
+                {campaigns.length === 0 ? (
+                  <p className="text-sm text-muted-foreground p-2">
+                    No campaigns available
+                  </p>
+                ) : (
+                  campaigns.map((campaign) => (
+                    <button
+                      key={campaign.id}
+                      type="button"
+                      onClick={() => handleCampaignToggle(campaign.name)}
+                      className={cn(
+                        'flex w-full items-center gap-2 rounded-sm px-2 py-1.5 text-sm hover:bg-accent hover:text-accent-foreground cursor-pointer',
+                        selectedCampaigns.includes(campaign.name) && 'bg-accent'
+                      )}
+                    >
+                      <div
+                        className={cn(
+                          'mr-2 flex h-4 w-4 items-center justify-center rounded-sm border border-primary',
+                          selectedCampaigns.includes(campaign.name)
+                            ? 'bg-primary text-primary-foreground'
+                            : 'opacity-50'
+                        )}
+                      >
+                        <Check className={cn('h-4 w-4', !selectedCampaigns.includes(campaign.name) && 'invisible')} />
+                      </div>
+                      {campaign.name}
+                    </button>
+                  ))
+                )}
+              </div>
+            </PopoverContent>
+          </Popover>
+        </div>
+
+        {/* Notes */}
+        <div className="space-y-2">
+          <Label className="text-sm font-medium">Notes (Optional)</Label>
+          <Textarea
+            value={notes}
+            onChange={(e) => setNotes(e.target.value)}
+            placeholder="Add notes for all creatives..."
+            className="rounded-sm resize-vertical min-h-20"
+            disabled={isUploading}
+          />
+        </div>
+      </div>
+    </DrawerSmall>
+  );
+}
