@@ -206,6 +206,42 @@ export type Database = {
           },
         ]
       }
+      campaign_creatives: {
+        Row: {
+          campaign_id: string
+          created_at: string
+          creative_id: string
+          id: string
+        }
+        Insert: {
+          campaign_id: string
+          created_at?: string
+          creative_id: string
+          id?: string
+        }
+        Update: {
+          campaign_id?: string
+          created_at?: string
+          creative_id?: string
+          id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "campaign_creatives_campaign_id_fkey"
+            columns: ["campaign_id"]
+            isOneToOne: false
+            referencedRelation: "campaigns"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "campaign_creatives_creative_id_fkey"
+            columns: ["creative_id"]
+            isOneToOne: false
+            referencedRelation: "creatives"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       campaigns: {
         Row: {
           assets: Json | null
