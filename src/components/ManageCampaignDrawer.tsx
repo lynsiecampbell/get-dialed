@@ -61,7 +61,6 @@ interface Creative {
   creative_type: string;
   creative_format: string;
   image_urls?: string[];
-  status: string;
 }
 
 interface LandingPage {

@@ -4,7 +4,6 @@ type Creative = {
   id: string;
   creative_name: string;
   campaign: string | null;
-  status: string;
   creative_group_type: string;
   parent_creative_id: string | null;
   creative_type: string;
