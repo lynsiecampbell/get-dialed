@@ -22,7 +22,6 @@ type Creative = {
   id: string;
   creative_name: string;
   campaign: string | null;
-  status: string;
   creative_group_type: string;
   parent_creative_id: string | null;
   creative_type: string;
@@ -112,7 +111,23 @@ export default function CreativeLibrary() {
       const {
         data,
         error
-      } = await supabase.from("creatives").select("*").order("created_at", {
+      } = await supabase.from("creatives").select(`
+        id,
+        creative_name,
+        campaign,
+        creative_group_type,
+        parent_creative_id,
+        creative_type,
+        file_url,
+        thumbnail_url,
+        format_dimensions,
+        file_size_mb,
+        tags,
+        notes,
+        created_at,
+        updated_at,
+        user_id
+      `).order("created_at", {
         ascending: false
       });
       if (error) throw error;
@@ -240,11 +255,6 @@ export default function CreativeLibrary() {
               creative_id: data.id
             });
           }
-
-          // Update creative status
-          await supabase.from("creatives")
-            .update({ status: "Assigned" })
-            .eq("id", data.id);
         }
       }
 
@@ -281,8 +291,7 @@ export default function CreativeLibrary() {
         user_id: user?.id,
         creative_name: carouselName,
         creative_group_type: "Carousel",
-        creative_type: "Single Image",
-        status: "Unassigned"
+        creative_type: "Single Image"
       }).select().single();
       if (parentError) throw parentError;
 
@@ -300,7 +309,6 @@ export default function CreativeLibrary() {
         await supabase.from("creatives").insert({
           user_id: user?.id,
           creative_name: file.name,
-          status: "Unassigned",
           creative_group_type: "Single",
           parent_creative_id: parentData.id,
           creative_type: metadata.creativeType,
@@ -326,11 +334,6 @@ export default function CreativeLibrary() {
               creative_id: parentData.id
             });
           }
-
-          // Update creative status
-          await supabase.from("creatives")
-            .update({ status: "Assigned" })
-            .eq("id", parentData.id);
         }
       }
 
@@ -752,10 +755,6 @@ export default function CreativeLibrary() {
                 <div>
                   <Label>Type</Label>
                   <p className="text-sm">{previewCreative.creative_type}</p>
-                </div>
-                <div>
-                  <Label>Status</Label>
-                  <p className="text-sm">{previewCreative.status}</p>
                 </div>
                 <div>
                   <Label>File Size</Label>
