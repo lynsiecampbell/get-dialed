@@ -180,8 +180,7 @@ export function NewCreativeDrawer({
           file_size_mb: 0,
           mime_type: "",
           tags: [],
-          notes,
-          status: "Unassigned"
+          notes
         }).select().single();
 
         if (error) throw error;
@@ -242,8 +241,7 @@ export function NewCreativeDrawer({
             file_size_mb: metadata.fileSizeMB,
             mime_type: metadata.mimeType,
             tags: [],
-            notes,
-            status: selectedCampaigns.length > 0 ? "Assigned" : "Unassigned"
+            notes
           }).select().single();
 
           if (error) throw error;
