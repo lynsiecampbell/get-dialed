@@ -20,13 +20,13 @@ export function AssetActions({ onEdit, onDuplicate, onDownload, onDelete, disabl
 
   return (
     <TooltipProvider delayDuration={200}>
-      <div className="inline-flex items-center border border-gray-200 bg-white h-8 rounded-md overflow-hidden">
+      <div className="inline-flex items-center border border-gray-200 bg-white h-8 rounded-sm overflow-hidden">
         {onEdit && (
           <>
             <Tooltip>
               <TooltipTrigger asChild>
                 <button
-                  className={cn(baseButtonClasses, !onDuplicate && !onDownload && !onDelete && "rounded-md")}
+                  className={cn(baseButtonClasses, !onDuplicate && !onDownload && !onDelete && "rounded-sm")}
                   onClick={onEdit}
                   disabled={disabled}
                   type="button"

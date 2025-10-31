@@ -100,7 +100,7 @@ export default function Auth() {
       <Card className="w-full max-w-md">
         <CardHeader className="space-y-1">
           <div className="flex items-center justify-center mb-4">
-            <div className="h-12 w-12 rounded-lg bg-primary flex items-center justify-center text-primary-foreground font-bold text-xl">
+            <div className="h-12 w-12 rounded-sm bg-primary flex items-center justify-center text-primary-foreground font-bold text-xl">
               AM
             </div>
           </div>

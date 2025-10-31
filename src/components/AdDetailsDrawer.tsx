@@ -145,7 +145,7 @@ export function AdDetailsDrawer({
         {creative && (
           <div className="space-y-3">
             <h3 className="text-sm font-medium text-muted-foreground">Creative</h3>
-            <div className="relative aspect-[4/5] overflow-hidden rounded-lg bg-black max-w-sm">
+            <div className="relative aspect-[4/5] overflow-hidden rounded-sm bg-black max-w-sm">
               {isVideo && creative.file_url ? (
                 <video
                   src={creative.file_url}
@@ -227,7 +227,7 @@ export function AdDetailsDrawer({
                   href={ad.landing_page.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center justify-center h-8 w-8 rounded-md hover:bg-accent hover:text-accent-foreground transition-colors"
+                  className="inline-flex items-center justify-center h-8 w-8 rounded-sm hover:bg-accent hover:text-accent-foreground transition-colors"
                 >
                   <ExternalLink className="h-3.5 w-3.5" />
                 </a>

@@ -63,7 +63,7 @@ export function EditableField({
         onBlur={handleSave}
         onKeyDown={handleKeyDown}
         className={cn(
-          "bg-gray-50 px-2 py-1 rounded-md text-sm text-gray-800 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-emerald-500 w-full resize-none transition-all",
+          "bg-gray-50 px-2 py-1 rounded-sm text-sm text-gray-800 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-emerald-500 w-full resize-none transition-all",
           className,
         )}
         autoFocus
@@ -77,7 +77,7 @@ export function EditableField({
         onBlur={handleSave}
         onKeyDown={handleKeyDown}
         className={cn(
-          "bg-gray-50 px-2 py-1 rounded-md text-sm text-gray-800 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-emerald-500 w-full transition-all",
+          "bg-gray-50 px-2 py-1 rounded-sm text-sm text-gray-800 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-emerald-500 w-full transition-all",
           className,
         )}
         autoFocus
@@ -90,7 +90,7 @@ export function EditableField({
     <div
       onClick={() => setIsEditing(true)}
       className={cn(
-        "px-2 py-1 rounded-md text-sm text-gray-800 cursor-pointer hover:bg-gray-50 hover:border hover:border-gray-300 transition-colors truncate",
+        "px-2 py-1 rounded-sm text-sm text-gray-800 cursor-pointer hover:bg-gray-50 hover:border hover:border-gray-300 transition-colors truncate",
         className,
       )}
       title="Click to edit"

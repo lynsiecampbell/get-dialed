@@ -38,7 +38,7 @@ export function CampaignGroup({
   const [isOpen, setIsOpen] = useState(defaultOpen);
 
   return (
-    <div className="border border-border rounded-lg bg-card overflow-hidden mb-4">
+    <div className="border border-border rounded-sm bg-card overflow-hidden mb-4">
       {/* Campaign Header */}
       <div className="bg-muted/30 border-b border-border">
         <div className="flex items-center justify-between px-6 py-4">
@@ -67,7 +67,7 @@ export function CampaignGroup({
 
           {/* Action Buttons */}
           <TooltipProvider>
-            <div className="inline-flex items-center border border-border bg-background h-8 rounded-md">
+            <div className="inline-flex items-center border border-border bg-background h-8 rounded-sm">
               {onCampaignSettings && (
                 <>
                   <Tooltip>

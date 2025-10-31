@@ -419,7 +419,7 @@ export function ManageCampaignDrawer({
 
             {/* Brand / Campaign Copy */}
             <Collapsible open={brandOpen} onOpenChange={setBrandOpen}>
-              <div className="border rounded-lg">
+              <div className="border rounded-sm">
                 <div className="flex items-center justify-between p-3 hover:bg-muted/50 transition-colors">
                   <CollapsibleTrigger className="flex items-center gap-2 flex-1">
                     <ChevronDown className={`h-4 w-4 transition-transform ${brandOpen ? "" : "-rotate-90"}`} />
@@ -462,7 +462,7 @@ export function ManageCampaignDrawer({
 
             {/* Email Messaging */}
             <Collapsible open={emailOpen} onOpenChange={setEmailOpen}>
-              <div className="border rounded-lg">
+              <div className="border rounded-sm">
                 <div className="flex items-center justify-between p-3 hover:bg-muted/50 transition-colors">
                   <CollapsibleTrigger className="flex items-center gap-2 flex-1">
                     <ChevronDown className={`h-4 w-4 transition-transform ${emailOpen ? "" : "-rotate-90"}`} />
@@ -505,7 +505,7 @@ export function ManageCampaignDrawer({
 
             {/* Ad Messaging */}
             <Collapsible open={adMessagingOpen} onOpenChange={setAdMessagingOpen}>
-              <div className="border rounded-lg">
+              <div className="border rounded-sm">
                 <div className="flex items-center justify-between p-3 hover:bg-muted/50 transition-colors">
                   <CollapsibleTrigger className="flex items-center gap-2 flex-1">
                     <ChevronDown className={`h-4 w-4 transition-transform ${adMessagingOpen ? "" : "-rotate-90"}`} />
@@ -548,7 +548,7 @@ export function ManageCampaignDrawer({
 
             {/* Social Messaging */}
             <Collapsible open={socialOpen} onOpenChange={setSocialOpen}>
-              <div className="border rounded-lg">
+              <div className="border rounded-sm">
                 <div className="flex items-center justify-between p-3 hover:bg-muted/50 transition-colors">
                   <CollapsibleTrigger className="flex items-center gap-2 flex-1">
                     <ChevronDown className={`h-4 w-4 transition-transform ${socialOpen ? "" : "-rotate-90"}`} />
@@ -596,7 +596,7 @@ export function ManageCampaignDrawer({
 
             {/* Creatives */}
             <Collapsible open={creativesOpen} onOpenChange={setCreativesOpen}>
-              <div className="border rounded-lg">
+              <div className="border rounded-sm">
                 <div className="flex items-center justify-between p-3 hover:bg-muted/50 transition-colors">
                   <CollapsibleTrigger className="flex items-center gap-2 flex-1">
                     <ChevronDown className={`h-4 w-4 transition-transform ${creativesOpen ? "" : "-rotate-90"}`} />
@@ -639,7 +639,7 @@ export function ManageCampaignDrawer({
 
             {/* Landing Pages */}
             <Collapsible open={landingPagesOpen} onOpenChange={setLandingPagesOpen}>
-              <div className="border rounded-lg">
+              <div className="border rounded-sm">
                 <div className="flex items-center justify-between p-3 hover:bg-muted/50 transition-colors">
                   <CollapsibleTrigger className="flex items-center gap-2 flex-1">
                     <ChevronDown className={`h-4 w-4 transition-transform ${landingPagesOpen ? "" : "-rotate-90"}`} />
@@ -682,7 +682,7 @@ export function ManageCampaignDrawer({
 
             {/* Ads */}
             <Collapsible open={adsOpen} onOpenChange={setAdsOpen}>
-              <div className="border rounded-lg">
+              <div className="border rounded-sm">
                 <div className="flex items-center justify-between p-3 hover:bg-muted/50 transition-colors">
                   <CollapsibleTrigger className="flex items-center gap-2 flex-1">
                     <ChevronDown className={`h-4 w-4 transition-transform ${adsOpen ? "" : "-rotate-90"}`} />
@@ -725,7 +725,7 @@ export function ManageCampaignDrawer({
 
             {/* Links */}
             <Collapsible open={linksOpen} onOpenChange={setLinksOpen}>
-              <div className="border rounded-lg">
+              <div className="border rounded-sm">
                 <div className="flex items-center justify-between p-3 hover:bg-muted/50 transition-colors">
                   <CollapsibleTrigger className="flex items-center gap-2 flex-1">
                     <ChevronDown className={`h-4 w-4 transition-transform ${linksOpen ? "" : "-rotate-90"}`} />

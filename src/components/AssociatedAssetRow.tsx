@@ -48,7 +48,7 @@ export function AssociatedAssetRow({
       {count > 0 && (
         <Collapsible open={isExpanded} onOpenChange={setIsExpanded}>
           <CollapsibleContent className="space-y-2 pl-10 pt-2">
-            {displayItems.map(item => <div key={item.id} className="flex items-center justify-between p-2 border rounded-lg hover:bg-muted/50 transition-colors group">
+            {displayItems.map(item => <div key={item.id} className="flex items-center justify-between p-2 border rounded-sm hover:bg-muted/50 transition-colors group">
                 <div className="flex items-center gap-3 flex-1 min-w-0">
                   {item.thumbnailUrl && <img src={item.thumbnailUrl} alt={item.name} className="h-10 w-10 object-cover rounded" />}
                   <div className="flex-1 min-w-0">

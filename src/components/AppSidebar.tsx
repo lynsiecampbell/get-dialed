@@ -47,7 +47,7 @@ export function AppSidebar() {
   return <Sidebar className={collapsed ? 'w-14' : 'w-48'} collapsible="icon">
       <SidebarHeader className="border-b border-sidebar-border p-4">
         {!collapsed && <div className="flex items-center gap-2">
-            <div className="h-8 w-8 rounded-lg bg-primary flex items-center justify-center text-primary-foreground font-bold">
+            <div className="h-8 w-8 rounded-sm bg-primary flex items-center justify-center text-primary-foreground font-bold">
               D
             </div>
             <span className="font-semibold text-foreground">Dialed</span>

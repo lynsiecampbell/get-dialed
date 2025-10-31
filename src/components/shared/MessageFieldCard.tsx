@@ -124,7 +124,7 @@ export function MessageFieldCard({
             type="text"
             value={editValue}
             onChange={(e) => setEditValue(e.target.value)}
-            className="w-full px-3 py-2 border border-input rounded-md focus:outline-none focus:ring-1 focus:ring-ring text-sm"
+            className="w-full px-3 py-2 border border-input rounded-sm focus:outline-none focus:ring-1 focus:ring-ring text-sm"
             placeholder="Enter text..."
             autoFocus
           />
@@ -159,7 +159,7 @@ export function MessageFieldCard({
     <>
       <div
         className={cn(
-          "relative group rounded-md p-3 transition-all duration-200 cursor-pointer border border-transparent",
+          "relative group rounded-sm p-3 transition-all duration-200 cursor-pointer border border-transparent",
           copied && "animate-pulse bg-green-50 dark:bg-green-950 border-green-200 dark:border-green-800",
           !copied && isHovered && "bg-teal-50 dark:bg-teal-950 border-teal-200 dark:border-teal-800",
           !copied && !isHovered && "bg-muted border-border",

@@ -266,7 +266,7 @@ export function CreativePickerModal({
             {filteredCreatives.map((creative) => (
               <div
                 key={creative.id}
-                className={`relative border rounded-lg overflow-hidden cursor-pointer transition-all hover:shadow-lg ${
+                className={`relative border rounded-sm overflow-hidden cursor-pointer transition-all hover:shadow-lg ${
                   selectedIds.includes(creative.id)
                     ? 'ring-2 ring-primary border-primary'
                     : 'border-border'

@@ -343,7 +343,7 @@ export function NewCreativeDrawer({
           </Label>
           <div className="space-y-2">
             <label className="block">
-              <div className="border-2 border-dashed border-gray-300 rounded-md p-8 hover:bg-gray-50 transition-colors cursor-pointer text-center">
+              <div className="border-2 border-dashed border-gray-300 rounded-sm p-8 hover:bg-gray-50 transition-colors cursor-pointer text-center">
                 <Upload className="w-6 h-6 mx-auto mb-2 text-gray-400" />
                 <p className="text-sm text-gray-600">
                   Click to upload or drag and drop

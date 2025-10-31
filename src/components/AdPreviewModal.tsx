@@ -61,7 +61,7 @@ export function AdPreviewModal({
         <div className="grid md:grid-cols-2 gap-6">
           {/* Left: Creative Preview */}
           <div className="space-y-4">
-            <div className="relative aspect-[4/5] overflow-hidden rounded-lg bg-black">
+            <div className="relative aspect-[4/5] overflow-hidden rounded-sm bg-black">
               {creative ? (
                 isVideo && creative.file_url ? (
                   <video

@@ -1095,7 +1095,7 @@ export function AddNewAdDrawer({
                 <div className="w-[45%] bg-muted/30 p-6 border-r overflow-y-auto">
                   <div className="sticky top-0">
                     {/* Ad Card Preview */}
-                    <div className="bg-background rounded-lg border shadow-sm overflow-hidden">
+                    <div className="bg-background rounded-sm border shadow-sm overflow-hidden">
                       {/* Sponsored Label */}
                       <div className="px-4 pt-3 pb-2">
                         <p className="text-xs text-muted-foreground font-medium">Sponsored</p>
@@ -1163,7 +1163,7 @@ export function AddNewAdDrawer({
                         
                         {/* CTA Button */}
                         {cta && (
-                          <button className="w-full py-2.5 bg-emerald-500 text-white font-semibold rounded-md hover:bg-emerald-600 transition-colors text-sm shadow-sm">
+                          <button className="w-full py-2.5 bg-emerald-500 text-white font-semibold rounded-sm hover:bg-emerald-600 transition-colors text-sm shadow-sm">
                             {cta}
                           </button>
                         )}
@@ -1233,7 +1233,7 @@ export function AddNewAdDrawer({
                   
                   {/* Add New Headline Dialog */}
                   {showAddHeadline && (
-                    <div className="mt-2 p-3 border border-border rounded-md bg-muted/50">
+                    <div className="mt-2 p-3 border border-border rounded-sm bg-muted/50">
                       <Label htmlFor="new-headline" className="text-sm font-medium mb-2 block">
                         New Headline
                       </Label>
@@ -1306,7 +1306,7 @@ export function AddNewAdDrawer({
                   
                   {/* Add New Body Text Dialog */}
                   {showAddPrimaryText && (
-                    <div className="mt-2 p-3 border border-border rounded-md bg-muted/50">
+                    <div className="mt-2 p-3 border border-border rounded-sm bg-muted/50">
                       <Label htmlFor="new-primary-text" className="text-sm font-medium mb-2 block">
                         New Body Text
                       </Label>

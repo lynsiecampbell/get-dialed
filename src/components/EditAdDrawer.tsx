@@ -519,7 +519,7 @@ export function EditAdDrawer({
 
           {/* Show messaging content selection */}
           {selectedMessaging && (
-            <div className="space-y-4 p-4 border rounded-lg bg-muted/50">
+            <div className="space-y-4 p-4 border rounded-sm bg-muted/50">
               {/* Headline */}
               {selectedMessaging.headlines.length > 0 && (
                 <div className="space-y-2">

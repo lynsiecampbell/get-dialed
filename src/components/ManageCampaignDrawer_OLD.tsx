@@ -396,7 +396,7 @@ export function ManageCampaignDrawer({
 
           {/* Brand / Campaign Copy */}
           <div className="space-y-2">
-            <div className="flex items-center justify-between p-3 bg-muted/50 rounded-lg hover:bg-muted/80 transition-colors cursor-pointer"
+            <div className="flex items-center justify-between p-3 bg-muted/50 rounded-sm hover:bg-muted/80 transition-colors cursor-pointer"
                  onClick={() => setShowBrandMessagingDrawer(true)}>
               <div className="flex items-center gap-2">
                 <Sparkles className="h-4 w-4 text-amber-600" />
@@ -410,7 +410,7 @@ export function ManageCampaignDrawer({
 
           {/* Email Messaging */}
           <div className="space-y-2">
-            <div className="flex items-center justify-between p-3 bg-muted/50 rounded-lg hover:bg-muted/80 transition-colors cursor-pointer"
+            <div className="flex items-center justify-between p-3 bg-muted/50 rounded-sm hover:bg-muted/80 transition-colors cursor-pointer"
                  onClick={() => setShowEmailMessagingDrawer(true)}>
               <div className="flex items-center gap-2">
                 <Mail className="h-4 w-4 text-emerald-600" />
@@ -424,7 +424,7 @@ export function ManageCampaignDrawer({
 
           {/* Ad Messaging */}
           <div className="space-y-2">
-            <div className="flex items-center justify-between p-3 bg-muted/50 rounded-lg hover:bg-muted/80 transition-colors cursor-pointer"
+            <div className="flex items-center justify-between p-3 bg-muted/50 rounded-sm hover:bg-muted/80 transition-colors cursor-pointer"
                  onClick={() => setShowAdMessagingDrawer(true)}>
               <div className="flex items-center gap-2">
                 <Megaphone className="h-4 w-4 text-blue-600" />
@@ -439,7 +439,7 @@ export function ManageCampaignDrawer({
 
           {/* Social Messaging */}
           <div className="space-y-2">
-            <div className="flex items-center justify-between p-3 bg-muted/50 rounded-lg hover:bg-muted/80 transition-colors cursor-pointer"
+            <div className="flex items-center justify-between p-3 bg-muted/50 rounded-sm hover:bg-muted/80 transition-colors cursor-pointer"
                  onClick={() => setShowSocialMessagingDrawer(true)}>
               <div className="flex items-center gap-2">
                 <MessageCircle className="h-4 w-4 text-purple-600" />
@@ -453,7 +453,7 @@ export function ManageCampaignDrawer({
           </div>
           {/* Creatives */}
           <Collapsible open={openSections.creatives} onOpenChange={() => toggleSection("creatives")}>
-            <CollapsibleTrigger className="flex items-center justify-between w-full p-3 bg-muted/50 rounded-lg hover:bg-muted transition-colors">
+            <CollapsibleTrigger className="flex items-center justify-between w-full p-3 bg-muted/50 rounded-sm hover:bg-muted transition-colors">
               <div className="flex items-center gap-2">
                 <Image className="h-4 w-4 text-cyan-600" />
                 <span className="font-medium">Creatives</span>
@@ -469,7 +469,7 @@ export function ManageCampaignDrawer({
                   const { icon: Icon, color } = getAssetIcon(creative);
                   const imageUrl = creative.thumbnail_url || creative.file_url || "/placeholder.svg";
                   return (
-                    <div key={creative.id} className="flex items-center justify-between p-3 border rounded-lg">
+                    <div key={creative.id} className="flex items-center justify-between p-3 border rounded-sm">
                       <div className="flex items-center gap-3">
                         <img src={imageUrl} alt={creative.name} className="h-12 w-12 rounded object-cover" />
                         <div>
@@ -502,7 +502,7 @@ export function ManageCampaignDrawer({
 
           {/* Landing Pages */}
           <Collapsible open={openSections.landingPages} onOpenChange={() => toggleSection("landingPages")}>
-            <CollapsibleTrigger className="flex items-center justify-between w-full p-3 bg-muted/50 rounded-lg hover:bg-muted transition-colors">
+            <CollapsibleTrigger className="flex items-center justify-between w-full p-3 bg-muted/50 rounded-sm hover:bg-muted transition-colors">
               <div className="flex items-center gap-2">
                 <Globe className="h-4 w-4 text-violet-600" />
                 <span className="font-medium">Landing Pages</span>
@@ -515,7 +515,7 @@ export function ManageCampaignDrawer({
                 <p className="text-sm text-muted-foreground px-3">No landing pages attached</p>
               ) : (
                 assets.landingPages.map((lp) => (
-                  <div key={lp.id} className="flex items-center justify-between p-3 border rounded-lg">
+                  <div key={lp.id} className="flex items-center justify-between p-3 border rounded-sm">
                     <div className="flex items-center gap-3">
                       <Globe className="h-4 w-4 text-violet-600" />
                       <div>
@@ -546,7 +546,7 @@ export function ManageCampaignDrawer({
 
           {/* Links */}
           <Collapsible open={openSections.links} onOpenChange={() => toggleSection("links")}>
-            <CollapsibleTrigger className="flex items-center justify-between w-full p-3 bg-muted/50 rounded-lg hover:bg-muted transition-colors">
+            <CollapsibleTrigger className="flex items-center justify-between w-full p-3 bg-muted/50 rounded-sm hover:bg-muted transition-colors">
               <div className="flex items-center gap-2">
                 <Link2 className="h-4 w-4 text-blue-600" />
                 <span className="font-medium">Links</span>
@@ -559,7 +559,7 @@ export function ManageCampaignDrawer({
                 <p className="text-sm text-muted-foreground px-3">No links attached</p>
               ) : (
                 assets.links.map((link: any) => (
-                  <div key={link.id} className="flex items-center justify-between p-3 border rounded-lg">
+                  <div key={link.id} className="flex items-center justify-between p-3 border rounded-sm">
                     <div className="flex items-center gap-3">
                       <Link2 className="h-4 w-4 text-blue-600" />
                       <div>
@@ -593,7 +593,7 @@ export function ManageCampaignDrawer({
 
           {/* Ads */}
           <Collapsible open={openSections.ads} onOpenChange={() => toggleSection("ads")}>
-            <CollapsibleTrigger className="flex items-center justify-between w-full p-3 bg-muted/50 rounded-lg hover:bg-muted transition-colors">
+            <CollapsibleTrigger className="flex items-center justify-between w-full p-3 bg-muted/50 rounded-sm hover:bg-muted transition-colors">
               <div className="flex items-center gap-2">
                 <Megaphone className="h-4 w-4 text-blue-600" />
                 <span className="font-medium">Ads</span>
@@ -608,7 +608,7 @@ export function ManageCampaignDrawer({
                 assets.ads.map((ad: any) => {
                   const imageUrl = ad.creatives?.thumbnail_url || ad.creatives?.file_url || "/placeholder.svg";
                   return (
-                    <div key={ad.id} className="flex items-center gap-3 p-3 border rounded-lg">
+                    <div key={ad.id} className="flex items-center gap-3 p-3 border rounded-sm">
                       <img src={imageUrl} alt="Ad" className="h-16 w-16 rounded object-cover" />
                       
                       <div className="flex-1 min-w-0">

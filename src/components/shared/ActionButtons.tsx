@@ -42,7 +42,7 @@ export function ActionButtons({
 
   return (
     <TooltipProvider>
-      <div className="inline-flex items-center border border-border bg-background h-8 rounded-md">
+      <div className="inline-flex items-center border border-border bg-background h-8 rounded-sm">
         {!hideEdit && onEdit && (
           <>
             <Tooltip>

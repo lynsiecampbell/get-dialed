@@ -114,7 +114,7 @@ export default function Links() {
       )}
 
       {links.length > 0 && (
-        <div className="border rounded-lg">
+        <div className="border rounded-sm">
           <table className="w-full">
             <thead className="bg-muted/50">
               <tr>
