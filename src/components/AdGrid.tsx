@@ -2,7 +2,7 @@ import { AdCard } from "./AdCard";
 
 interface Creative {
   id: string;
-  creative_name: string;
+  name: string;
   creative_type: string;
   thumbnail_url: string | null;
   file_url: string | null;

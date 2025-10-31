@@ -14,24 +14,92 @@ export type Database = {
   }
   public: {
     Tables: {
+      ad_campaigns: {
+        Row: {
+          bid_strategy: string | null
+          budget_type: string | null
+          campaign_id: string
+          created_at: string | null
+          daily_budget: number | null
+          end_date: string | null
+          id: string
+          lifetime_budget: number | null
+          name: string
+          notes: string | null
+          objective: string | null
+          platform: string
+          spent: number | null
+          start_date: string | null
+          status: string
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          bid_strategy?: string | null
+          budget_type?: string | null
+          campaign_id: string
+          created_at?: string | null
+          daily_budget?: number | null
+          end_date?: string | null
+          id?: string
+          lifetime_budget?: number | null
+          name: string
+          notes?: string | null
+          objective?: string | null
+          platform: string
+          spent?: number | null
+          start_date?: string | null
+          status?: string
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          bid_strategy?: string | null
+          budget_type?: string | null
+          campaign_id?: string
+          created_at?: string | null
+          daily_budget?: number | null
+          end_date?: string | null
+          id?: string
+          lifetime_budget?: number | null
+          name?: string
+          notes?: string | null
+          objective?: string | null
+          platform?: string
+          spent?: number | null
+          start_date?: string | null
+          status?: string
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ad_campaigns_campaign_id_fkey"
+            columns: ["campaign_id"]
+            isOneToOne: false
+            referencedRelation: "campaigns"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       ad_creatives: {
         Row: {
           ad_id: string
-          created_at: string
+          created_at: string | null
           creative_id: string
           id: string
           position: number | null
         }
         Insert: {
           ad_id: string
-          created_at?: string
+          created_at?: string | null
           creative_id: string
           id?: string
           position?: number | null
         }
         Update: {
           ad_id?: string
-          created_at?: string
+          created_at?: string | null
           creative_id?: string
           id?: string
           position?: number | null
@@ -53,104 +121,190 @@ export type Database = {
           },
         ]
       }
-      ads: {
+      ad_exports: {
         Row: {
-          ad_format: string
-          ad_name: string | null
-          ad_set_name: string | null
-          audience_type: string
-          body: string | null
-          campaign_budget: number | null
-          campaign_id: string
-          caption: string | null
-          created_at: string | null
-          creative_filename: string | null
-          creative_group_id: string | null
-          creative_id: string | null
-          creative_type: string
-          cta_label: string | null
-          display_link: string | null
-          headline: string | null
+          ad_count: number | null
+          ad_ids: string[] | null
+          campaign_id: string | null
+          created_at: string
+          export_format: string | null
+          file_name: string | null
           id: string
-          landing_page_id: string | null
-          landing_page_url: string
-          landing_page_url_with_utm: string | null
-          medium: string | null
-          meta_creative_id: string | null
-          objective: string | null
-          source: string | null
-          start_time: string | null
-          status: string
-          updated_at: string | null
+          platform: string
           user_id: string
-          utm_link: string | null
-          version: string
         }
         Insert: {
-          ad_format?: string
-          ad_name?: string | null
-          ad_set_name?: string | null
-          audience_type: string
-          body?: string | null
-          campaign_budget?: number | null
-          campaign_id: string
-          caption?: string | null
-          created_at?: string | null
-          creative_filename?: string | null
-          creative_group_id?: string | null
-          creative_id?: string | null
-          creative_type?: string
-          cta_label?: string | null
-          display_link?: string | null
-          headline?: string | null
+          ad_count?: number | null
+          ad_ids?: string[] | null
+          campaign_id?: string | null
+          created_at?: string
+          export_format?: string | null
+          file_name?: string | null
           id?: string
-          landing_page_id?: string | null
-          landing_page_url: string
-          landing_page_url_with_utm?: string | null
-          medium?: string | null
-          meta_creative_id?: string | null
-          objective?: string | null
-          source?: string | null
-          start_time?: string | null
-          status?: string
-          updated_at?: string | null
+          platform?: string
           user_id: string
-          utm_link?: string | null
-          version: string
         }
         Update: {
-          ad_format?: string
-          ad_name?: string | null
-          ad_set_name?: string | null
-          audience_type?: string
-          body?: string | null
-          campaign_budget?: number | null
-          campaign_id?: string
-          caption?: string | null
-          created_at?: string | null
-          creative_filename?: string | null
-          creative_group_id?: string | null
-          creative_id?: string | null
-          creative_type?: string
-          cta_label?: string | null
-          display_link?: string | null
-          headline?: string | null
+          ad_count?: number | null
+          ad_ids?: string[] | null
+          campaign_id?: string | null
+          created_at?: string
+          export_format?: string | null
+          file_name?: string | null
           id?: string
-          landing_page_id?: string | null
-          landing_page_url?: string
-          landing_page_url_with_utm?: string | null
-          medium?: string | null
-          meta_creative_id?: string | null
-          objective?: string | null
-          source?: string | null
-          start_time?: string | null
-          status?: string
-          updated_at?: string | null
+          platform?: string
           user_id?: string
-          utm_link?: string | null
-          version?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "ad_exports_campaign_id_fkey"
+            columns: ["campaign_id"]
+            isOneToOne: false
+            referencedRelation: "campaigns"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ad_sets: {
+        Row: {
+          ad_campaign_id: string
+          bid_amount: number | null
+          bid_strategy: string | null
+          budget_type: string | null
+          created_at: string | null
+          daily_budget: number | null
+          end_date: string | null
+          id: string
+          lifetime_budget: number | null
+          name: string
+          notes: string | null
+          optimization_goal: string | null
+          placements: Json | null
+          spent: number | null
+          start_date: string | null
+          status: string
+          targeting: Json | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          ad_campaign_id: string
+          bid_amount?: number | null
+          bid_strategy?: string | null
+          budget_type?: string | null
+          created_at?: string | null
+          daily_budget?: number | null
+          end_date?: string | null
+          id?: string
+          lifetime_budget?: number | null
+          name: string
+          notes?: string | null
+          optimization_goal?: string | null
+          placements?: Json | null
+          spent?: number | null
+          start_date?: string | null
+          status?: string
+          targeting?: Json | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          ad_campaign_id?: string
+          bid_amount?: number | null
+          bid_strategy?: string | null
+          budget_type?: string | null
+          created_at?: string | null
+          daily_budget?: number | null
+          end_date?: string | null
+          id?: string
+          lifetime_budget?: number | null
+          name?: string
+          notes?: string | null
+          optimization_goal?: string | null
+          placements?: Json | null
+          spent?: number | null
+          start_date?: string | null
+          status?: string
+          targeting?: Json | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ad_sets_ad_campaign_id_fkey"
+            columns: ["ad_campaign_id"]
+            isOneToOne: false
+            referencedRelation: "ad_campaigns"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ads: {
+        Row: {
+          ad_format: string | null
+          ad_set_id: string | null
+          audience_type: string | null
+          body_copy_index: number | null
+          campaign_id: string
+          created_at: string
+          creative_id: string | null
+          cta_index: number | null
+          headline_index: number | null
+          id: string
+          landing_page_id: string | null
+          messaging_id: string | null
+          platform: string | null
+          status: string
+          updated_at: string
+          user_id: string
+          version: string | null
+        }
+        Insert: {
+          ad_format?: string | null
+          ad_set_id?: string | null
+          audience_type?: string | null
+          body_copy_index?: number | null
+          campaign_id: string
+          created_at?: string
+          creative_id?: string | null
+          cta_index?: number | null
+          headline_index?: number | null
+          id?: string
+          landing_page_id?: string | null
+          messaging_id?: string | null
+          platform?: string | null
+          status?: string
+          updated_at?: string
+          user_id: string
+          version?: string | null
+        }
+        Update: {
+          ad_format?: string | null
+          ad_set_id?: string | null
+          audience_type?: string | null
+          body_copy_index?: number | null
+          campaign_id?: string
+          created_at?: string
+          creative_id?: string | null
+          cta_index?: number | null
+          headline_index?: number | null
+          id?: string
+          landing_page_id?: string | null
+          messaging_id?: string | null
+          platform?: string | null
+          status?: string
+          updated_at?: string
+          user_id?: string
+          version?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ads_ad_set_id_fkey"
+            columns: ["ad_set_id"]
+            isOneToOne: false
+            referencedRelation: "ad_sets"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "ads_campaign_id_fkey"
             columns: ["campaign_id"]
@@ -162,7 +316,7 @@ export type Database = {
             foreignKeyName: "ads_creative_id_fkey"
             columns: ["creative_id"]
             isOneToOne: false
-            referencedRelation: "messaging_matrix"
+            referencedRelation: "creatives"
             referencedColumns: ["id"]
           },
           {
@@ -172,89 +326,258 @@ export type Database = {
             referencedRelation: "landing_pages"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "ads_messaging_id_fkey"
+            columns: ["messaging_id"]
+            isOneToOne: false
+            referencedRelation: "messaging"
+            referencedColumns: ["id"]
+          },
         ]
       }
-      campaign_assets: {
+      brand_variants: {
         Row: {
-          asset_id: string
-          asset_type: string
-          campaign_id: string
+          brand_headlines: string[] | null
+          copy: string[] | null
           created_at: string
           id: string
+          messaging_id: string
+          sort_order: number | null
+          taglines: string[] | null
+          updated_at: string
+          user_id: string
+          value_props: string[] | null
+          variant_name: string
         }
         Insert: {
-          asset_id: string
-          asset_type: string
-          campaign_id: string
+          brand_headlines?: string[] | null
+          copy?: string[] | null
           created_at?: string
           id?: string
+          messaging_id: string
+          sort_order?: number | null
+          taglines?: string[] | null
+          updated_at?: string
+          user_id: string
+          value_props?: string[] | null
+          variant_name: string
         }
         Update: {
-          asset_id?: string
-          asset_type?: string
-          campaign_id?: string
+          brand_headlines?: string[] | null
+          copy?: string[] | null
           created_at?: string
           id?: string
+          messaging_id?: string
+          sort_order?: number | null
+          taglines?: string[] | null
+          updated_at?: string
+          user_id?: string
+          value_props?: string[] | null
+          variant_name?: string
         }
         Relationships: [
           {
-            foreignKeyName: "campaign_assets_campaign_id_fkey"
+            foreignKeyName: "brand_variants_messaging_id_fkey"
+            columns: ["messaging_id"]
+            isOneToOne: false
+            referencedRelation: "messaging"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      campaign_creatives: {
+        Row: {
+          campaign_id: string
+          created_at: string
+          creative_id: string
+          id: string
+          is_primary: boolean | null
+        }
+        Insert: {
+          campaign_id: string
+          created_at?: string
+          creative_id: string
+          id?: string
+          is_primary?: boolean | null
+        }
+        Update: {
+          campaign_id?: string
+          created_at?: string
+          creative_id?: string
+          id?: string
+          is_primary?: boolean | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "campaign_creatives_campaign_id_fkey"
             columns: ["campaign_id"]
             isOneToOne: false
             referencedRelation: "campaigns"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "campaign_creatives_creative_id_fkey"
+            columns: ["creative_id"]
+            isOneToOne: false
+            referencedRelation: "creatives"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      campaign_landing_pages: {
+        Row: {
+          campaign_id: string
+          created_at: string
+          id: string
+          is_primary: boolean | null
+          landing_page_id: string
+        }
+        Insert: {
+          campaign_id: string
+          created_at?: string
+          id?: string
+          is_primary?: boolean | null
+          landing_page_id: string
+        }
+        Update: {
+          campaign_id?: string
+          created_at?: string
+          id?: string
+          is_primary?: boolean | null
+          landing_page_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "campaign_landing_pages_campaign_id_fkey"
+            columns: ["campaign_id"]
+            isOneToOne: false
+            referencedRelation: "campaigns"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "campaign_landing_pages_landing_page_id_fkey"
+            columns: ["landing_page_id"]
+            isOneToOne: false
+            referencedRelation: "landing_pages"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      campaign_links: {
+        Row: {
+          campaign_id: string
+          created_at: string
+          id: string
+          link_id: string
+        }
+        Insert: {
+          campaign_id: string
+          created_at?: string
+          id?: string
+          link_id: string
+        }
+        Update: {
+          campaign_id?: string
+          created_at?: string
+          id?: string
+          link_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "campaign_links_campaign_id_fkey"
+            columns: ["campaign_id"]
+            isOneToOne: false
+            referencedRelation: "campaigns"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "campaign_links_link_id_fkey"
+            columns: ["link_id"]
+            isOneToOne: false
+            referencedRelation: "links"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      campaign_messaging: {
+        Row: {
+          campaign_id: string
+          created_at: string
+          id: string
+          messaging_id: string
+        }
+        Insert: {
+          campaign_id: string
+          created_at?: string
+          id?: string
+          messaging_id: string
+        }
+        Update: {
+          campaign_id?: string
+          created_at?: string
+          id?: string
+          messaging_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "campaign_messaging_campaign_id_fkey"
+            columns: ["campaign_id"]
+            isOneToOne: false
+            referencedRelation: "campaigns"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "campaign_messaging_messaging_id_fkey"
+            columns: ["messaging_id"]
+            isOneToOne: false
+            referencedRelation: "messaging"
             referencedColumns: ["id"]
           },
         ]
       }
       campaigns: {
         Row: {
-          assets: Json | null
-          buying_type: string | null
-          campaign_type: Database["public"]["Enums"]["campaign_type"]
+          budget: number | null
           created_at: string
-          daily_budget: number | null
           end_date: string | null
+          goal: string | null
           id: string
-          messaging: Json | null
           name: string
           notes: string | null
-          objective: string | null
+          spent: number | null
           start_date: string | null
-          status: string | null
+          status: string
+          type: string | null
           updated_at: string
           user_id: string
         }
         Insert: {
-          assets?: Json | null
-          buying_type?: string | null
-          campaign_type?: Database["public"]["Enums"]["campaign_type"]
+          budget?: number | null
           created_at?: string
-          daily_budget?: number | null
           end_date?: string | null
+          goal?: string | null
           id?: string
-          messaging?: Json | null
           name: string
           notes?: string | null
-          objective?: string | null
+          spent?: number | null
           start_date?: string | null
-          status?: string | null
+          status?: string
+          type?: string | null
           updated_at?: string
           user_id: string
         }
         Update: {
-          assets?: Json | null
-          buying_type?: string | null
-          campaign_type?: Database["public"]["Enums"]["campaign_type"]
+          budget?: number | null
           created_at?: string
-          daily_budget?: number | null
           end_date?: string | null
+          goal?: string | null
           id?: string
-          messaging?: Json | null
           name?: string
           notes?: string | null
-          objective?: string | null
+          spent?: number | null
           start_date?: string | null
-          status?: string | null
+          status?: string
+          type?: string | null
           updated_at?: string
           user_id?: string
         }
@@ -262,99 +585,111 @@ export type Database = {
       }
       creatives: {
         Row: {
-          campaign: string | null
           created_at: string
-          creative_group_type: string
-          creative_name: string
           creative_type: string
-          file_size_mb: number | null
-          file_url: string | null
-          format_dimensions: string | null
           id: string
-          mime_type: string | null
-          notes: string | null
-          parent_creative_id: string | null
-          status: string
-          tags: string[] | null
-          thumbnail_url: string | null
+          image_urls: string[] | null
+          name: string
           updated_at: string
           user_id: string
         }
         Insert: {
-          campaign?: string | null
           created_at?: string
-          creative_group_type?: string
-          creative_name: string
           creative_type: string
-          file_size_mb?: number | null
-          file_url?: string | null
-          format_dimensions?: string | null
           id?: string
-          mime_type?: string | null
-          notes?: string | null
-          parent_creative_id?: string | null
-          status?: string
-          tags?: string[] | null
-          thumbnail_url?: string | null
+          image_urls?: string[] | null
+          name: string
           updated_at?: string
           user_id: string
         }
         Update: {
-          campaign?: string | null
           created_at?: string
-          creative_group_type?: string
-          creative_name?: string
           creative_type?: string
-          file_size_mb?: number | null
-          file_url?: string | null
-          format_dimensions?: string | null
           id?: string
-          mime_type?: string | null
-          notes?: string | null
-          parent_creative_id?: string | null
-          status?: string
-          tags?: string[] | null
-          thumbnail_url?: string | null
+          image_urls?: string[] | null
+          name?: string
           updated_at?: string
           user_id?: string
         }
+        Relationships: []
+      }
+      email_variants: {
+        Row: {
+          body_copy: string[] | null
+          created_at: string
+          ctas: string[] | null
+          id: string
+          messaging_id: string
+          preview_texts: string[] | null
+          sort_order: number | null
+          subject_lines: string[] | null
+          updated_at: string
+          user_id: string
+          variant_name: string
+        }
+        Insert: {
+          body_copy?: string[] | null
+          created_at?: string
+          ctas?: string[] | null
+          id?: string
+          messaging_id: string
+          preview_texts?: string[] | null
+          sort_order?: number | null
+          subject_lines?: string[] | null
+          updated_at?: string
+          user_id: string
+          variant_name: string
+        }
+        Update: {
+          body_copy?: string[] | null
+          created_at?: string
+          ctas?: string[] | null
+          id?: string
+          messaging_id?: string
+          preview_texts?: string[] | null
+          sort_order?: number | null
+          subject_lines?: string[] | null
+          updated_at?: string
+          user_id?: string
+          variant_name?: string
+        }
         Relationships: [
           {
-            foreignKeyName: "creatives_parent_creative_id_fkey"
-            columns: ["parent_creative_id"]
+            foreignKeyName: "email_variants_messaging_id_fkey"
+            columns: ["messaging_id"]
             isOneToOne: false
-            referencedRelation: "creatives"
+            referencedRelation: "messaging"
             referencedColumns: ["id"]
           },
         ]
       }
       landing_pages: {
         Row: {
-          campaigns: string[] | null
           created_at: string
+          description: string | null
           id: string
-          name: string | null
-          notes: string | null
+          name: string
+          status: string
           updated_at: string
           url: string
           user_id: string
         }
         Insert: {
-          campaigns?: string[] | null
           created_at?: string
+          description?: string | null
           id?: string
-          name?: string | null
-          notes?: string | null
+          name: string
+          status?: string
           updated_at?: string
           url: string
           user_id: string
         }
         Update: {
-          campaigns?: string[] | null
           created_at?: string
+          description?: string | null
           id?: string
-          name?: string | null
-          notes?: string | null
+          name?: string
+          status?: string
           updated_at?: string
           url?: string
           user_id?: string
@@ -364,292 +699,160 @@ export type Database = {
       links: {
         Row: {
           ad_id: string | null
-          audience: string | null
-          campaign: string
+          additional_params: Json | null
+          base_url: string
           created_at: string
-          creative_id: string | null
-          generated_utm_url: string | null
+          full_url: string | null
           id: string
-          landing_page_url: string
-          link_name: string
-          medium: string
+          link_name: string | null
+          link_type: string
           notes: string | null
-          source: string
+          template: string | null
           updated_at: string
           user_id: string
-          utm_medium_manual: string | null
-          utm_source_manual: string | null
+          utm_campaign: string | null
+          utm_content: string | null
+          utm_medium: string | null
+          utm_source: string | null
+          utm_term: string | null
         }
         Insert: {
           ad_id?: string | null
-          audience?: string | null
-          campaign: string
+          additional_params?: Json | null
+          base_url: string
           created_at?: string
-          creative_id?: string | null
-          generated_utm_url?: string | null
+          full_url?: string | null
           id?: string
-          landing_page_url: string
-          link_name: string
-          medium: string
+          link_name?: string | null
+          link_type: string
           notes?: string | null
-          source: string
+          template?: string | null
           updated_at?: string
           user_id: string
-          utm_medium_manual?: string | null
-          utm_source_manual?: string | null
+          utm_campaign?: string | null
+          utm_content?: string | null
+          utm_medium?: string | null
+          utm_source?: string | null
+          utm_term?: string | null
         }
         Update: {
           ad_id?: string | null
-          audience?: string | null
-          campaign?: string
+          additional_params?: Json | null
+          base_url?: string
           created_at?: string
-          creative_id?: string | null
-          generated_utm_url?: string | null
+          full_url?: string | null
           id?: string
-          landing_page_url?: string
-          link_name?: string
-          medium?: string
+          link_name?: string | null
+          link_type?: string
           notes?: string | null
-          source?: string
+          template?: string | null
           updated_at?: string
           user_id?: string
-          utm_medium_manual?: string | null
-          utm_source_manual?: string | null
-        }
-        Relationships: []
-      }
-      messaging_ads: {
-        Row: {
-          ad_id: string
-          created_at: string
-          id: string
-          messaging_id: string
-        }
-        Insert: {
-          ad_id: string
-          created_at?: string
-          id?: string
-          messaging_id: string
-        }
-        Update: {
-          ad_id?: string
-          created_at?: string
-          id?: string
-          messaging_id?: string
+          utm_campaign?: string | null
+          utm_content?: string | null
+          utm_medium?: string | null
+          utm_source?: string | null
+          utm_term?: string | null
         }
         Relationships: [
           {
-            foreignKeyName: "messaging_ads_ad_id_fkey"
+            foreignKeyName: "links_ad_id_fkey"
             columns: ["ad_id"]
             isOneToOne: false
             referencedRelation: "ads"
             referencedColumns: ["id"]
           },
-          {
-            foreignKeyName: "messaging_ads_messaging_id_fkey"
-            columns: ["messaging_id"]
-            isOneToOne: false
-            referencedRelation: "messaging_matrix"
-            referencedColumns: ["id"]
-          },
         ]
       }
-      messaging_creatives: {
+      messaging: {
         Row: {
+          body_copy: string[] | null
           created_at: string
-          creative_id: string
-          id: string
-          messaging_id: string
-        }
-        Insert: {
-          created_at?: string
-          creative_id: string
-          id?: string
-          messaging_id: string
-        }
-        Update: {
-          created_at?: string
-          creative_id?: string
-          id?: string
-          messaging_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "messaging_creatives_creative_id_fkey"
-            columns: ["creative_id"]
-            isOneToOne: false
-            referencedRelation: "creatives"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "messaging_creatives_messaging_id_fkey"
-            columns: ["messaging_id"]
-            isOneToOne: false
-            referencedRelation: "messaging_matrix"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      messaging_landing_pages: {
-        Row: {
-          created_at: string
-          id: string
-          landing_page_id: string
-          messaging_id: string
-        }
-        Insert: {
-          created_at?: string
-          id?: string
-          landing_page_id: string
-          messaging_id: string
-        }
-        Update: {
-          created_at?: string
-          id?: string
-          landing_page_id?: string
-          messaging_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "messaging_landing_pages_landing_page_id_fkey"
-            columns: ["landing_page_id"]
-            isOneToOne: false
-            referencedRelation: "landing_pages"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "messaging_landing_pages_messaging_id_fkey"
-            columns: ["messaging_id"]
-            isOneToOne: false
-            referencedRelation: "messaging_matrix"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      messaging_matrix: {
-        Row: {
-          campaign: string
-          campaign_type: Database["public"]["Enums"]["campaign_type"]
-          created_at: string | null
-          headline: string | null
+          ctas: string[] | null
           headlines: string[] | null
           id: string
+          messaging_type: string
+          name: string
           notes: string | null
-          primary_text: string | null
-          primary_texts: string[] | null
-          updated_at: string | null
+          subject_lines: string[] | null
+          updated_at: string
           user_id: string
         }
         Insert: {
-          campaign: string
-          campaign_type?: Database["public"]["Enums"]["campaign_type"]
-          created_at?: string | null
-          headline?: string | null
+          body_copy?: string[] | null
+          created_at?: string
+          ctas?: string[] | null
           headlines?: string[] | null
           id?: string
+          messaging_type: string
+          name: string
           notes?: string | null
-          primary_text?: string | null
-          primary_texts?: string[] | null
-          updated_at?: string | null
+          subject_lines?: string[] | null
+          updated_at?: string
           user_id: string
         }
         Update: {
-          campaign?: string
-          campaign_type?: Database["public"]["Enums"]["campaign_type"]
-          created_at?: string | null
-          headline?: string | null
+          body_copy?: string[] | null
+          created_at?: string
+          ctas?: string[] | null
           headlines?: string[] | null
           id?: string
+          messaging_type?: string
+          name?: string
           notes?: string | null
-          primary_text?: string | null
-          primary_texts?: string[] | null
-          updated_at?: string | null
+          subject_lines?: string[] | null
+          updated_at?: string
           user_id?: string
         }
         Relationships: []
       }
       profiles: {
         Row: {
-          created_at: string | null
+          created_at: string
           email: string | null
           full_name: string | null
           id: string
-          updated_at: string | null
+          referrer_url: string | null
+          signup_ip: unknown
+          signup_user_agent: string | null
+          updated_at: string
+          utm_campaign: string | null
+          utm_content: string | null
+          utm_medium: string | null
+          utm_source: string | null
+          utm_term: string | null
         }
         Insert: {
-          created_at?: string | null
+          created_at?: string
           email?: string | null
           full_name?: string | null
           id: string
-          updated_at?: string | null
+          referrer_url?: string | null
+          signup_ip?: unknown
+          signup_user_agent?: string | null
+          updated_at?: string
+          utm_campaign?: string | null
+          utm_content?: string | null
+          utm_medium?: string | null
+          utm_source?: string | null
+          utm_term?: string | null
         }
         Update: {
-          created_at?: string | null
+          created_at?: string
           email?: string | null
           full_name?: string | null
           id?: string
-          updated_at?: string | null
+          referrer_url?: string | null
+          signup_ip?: unknown
+          signup_user_agent?: string | null
+          updated_at?: string
+          utm_campaign?: string | null
+          utm_content?: string | null
+          utm_medium?: string | null
+          utm_source?: string | null
+          utm_term?: string | null
         }
         Relationships: []
-      }
-      social_posts: {
-        Row: {
-          campaign: string | null
-          copy: string | null
-          created_at: string
-          creative_id: string | null
-          id: string
-          notes: string | null
-          platform: string
-          post_id: string
-          posted_url: string | null
-          scheduled_date: string | null
-          status: string
-          updated_at: string
-          user_id: string
-          utm_link: string | null
-        }
-        Insert: {
-          campaign?: string | null
-          copy?: string | null
-          created_at?: string
-          creative_id?: string | null
-          id?: string
-          notes?: string | null
-          platform: string
-          post_id: string
-          posted_url?: string | null
-          scheduled_date?: string | null
-          status?: string
-          updated_at?: string
-          user_id: string
-          utm_link?: string | null
-        }
-        Update: {
-          campaign?: string | null
-          copy?: string | null
-          created_at?: string
-          creative_id?: string | null
-          id?: string
-          notes?: string | null
-          platform?: string
-          post_id?: string
-          posted_url?: string | null
-          scheduled_date?: string | null
-          status?: string
-          updated_at?: string
-          user_id?: string
-          utm_link?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "social_posts_creative_id_fkey"
-            columns: ["creative_id"]
-            isOneToOne: false
-            referencedRelation: "creatives"
-            referencedColumns: ["id"]
-          },
-        ]
       }
     }
     Views: {
@@ -671,7 +874,7 @@ export type Database = {
       slugify_utm: { Args: { text: string }; Returns: string }
     }
     Enums: {
-      campaign_type: "evergreen" | "product" | "content" | "promo" | "launch"
+      [_ in never]: never
     }
     CompositeTypes: {
       [_ in never]: never
@@ -798,8 +1001,6 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {
-      campaign_type: ["evergreen", "product", "content", "promo", "launch"],
-    },
+    Enums: {},
   },
 } as const

@@ -28,7 +28,7 @@ interface AdPreviewModalProps {
     headline?: string | null;
     body?: string | null;
     creative?: {
-      creative_name: string;
+      name: string;
       creative_type: string;
       file_url: string | null;
       thumbnail_url: string | null;

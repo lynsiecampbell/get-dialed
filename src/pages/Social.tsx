@@ -27,7 +27,7 @@ interface SocialPost {
   notes: string | null;
   creative?: {
     id: string;
-    creative_name: string;
+    name: string;
     thumbnail_url: string | null;
     file_url: string | null;
     creative_type: string;

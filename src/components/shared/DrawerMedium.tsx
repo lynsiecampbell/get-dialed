@@ -5,6 +5,7 @@ import {
   SheetDescription,
   SheetHeader,
   SheetTitle,
+  SheetClose,
 } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
 import { X } from 'lucide-react';
@@ -19,9 +20,7 @@ interface DrawerMediumProps {
   
   // Footer props
   onSave?: () => void;
-  onCancel?: () => void;
   saveText?: string;
-  cancelText?: string;
   footerLeftContent?: ReactNode;
   hideFooter?: boolean;
   
@@ -43,9 +42,7 @@ export function DrawerMedium({
   description,
   children,
   onSave,
-  onCancel,
   saveText = 'Save',
-  cancelText = 'Cancel',
   footerLeftContent,
   hideFooter = false,
   headerActions,
@@ -53,16 +50,8 @@ export function DrawerMedium({
   hasNestedDrawer = false,
   zIndex = 50,
 }: DrawerMediumProps) {
-  const handleCancel = () => {
-    if (onCancel) {
-      onCancel();
-    } else {
-      onClose();
-    }
-  };
-
   return (
-    <Sheet open={isOpen} onOpenChange={onClose}>
+    <Sheet open={isOpen} onOpenChange={(open) => { if (!open) onClose(); }}>
       <SheetContent 
         className={cn(
           "w-[700px] sm:max-w-[700px] p-0 flex flex-col transition-all duration-300",
@@ -86,15 +75,17 @@ export function DrawerMedium({
             </div>
             <div className="flex items-center gap-2 ml-4">
               {headerActions}
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={onClose}
-                className="h-10 w-10 rounded-sm hover:bg-gray-100"
-                aria-label="Close"
-              >
-                <X className="h-4 w-4" />
-              </Button>
+              <SheetClose asChild>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={onClose}
+                  className="h-10 w-10 rounded-sm hover:bg-gray-100"
+                  aria-label="Close"
+                >
+                  <X className="h-4 w-4" />
+                </Button>
+              </SheetClose>
             </div>
           </div>
         </SheetHeader>
@@ -112,14 +103,6 @@ export function DrawerMedium({
                 {footerLeftContent}
               </div>
               <div className="flex items-center gap-3">
-                <Button
-                  variant="outline"
-                  onClick={handleCancel}
-                  disabled={isLoading}
-                  className="h-10 px-4 text-sm font-medium border-teal-500 text-teal-600 hover:bg-teal-50 rounded-sm"
-                >
-                  {cancelText}
-                </Button>
                 {onSave && (
                   <Button
                     onClick={onSave}

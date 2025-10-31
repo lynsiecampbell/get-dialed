@@ -11,7 +11,7 @@ import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
-import { DrawerPanel } from "@/components/ui/DrawerPanel";
+import { DrawerLarge } from "@/components/shared/DrawerLarge";
 import { showSuccess, showError } from "@/lib/toast-helpers";
 
 interface NewCampaignDrawerProps {
@@ -94,11 +94,13 @@ export function NewCampaignDrawer({
   };
 
   return (
-    <DrawerPanel
-      open={open}
-      onOpenChange={(isOpen) => !isOpen && handleClose()}
+    <DrawerLarge
+      isOpen={open}
+      onClose={handleClose}
       title="Create Campaign"
-      size="md"
+      onSave={handleCreate}
+      saveText={loading ? "Creating..." : "Create Campaign"}
+      isLoading={loading}
     >
       <div className="space-y-6 p-6">
         <p className="text-sm text-muted-foreground">
@@ -215,16 +217,8 @@ export function NewCampaignDrawer({
           />
         </div>
 
-        {/* Actions */}
-        <div className="flex justify-end gap-2 pt-4 border-t">
-          <Button variant="outline" onClick={handleClose}>
-            Cancel
-          </Button>
-          <Button onClick={handleCreate} disabled={loading}>
-            {loading ? "Creating..." : "Create Campaign"}
-          </Button>
-        </div>
+        {/* Actions are handled by Drawer footer */}
       </div>
-    </DrawerPanel>
+    </DrawerLarge>
   );
 }

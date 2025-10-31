@@ -1074,7 +1074,7 @@ export function NewAdDrawer({
                           variant="secondary"
                           className="pr-1"
                         >
-                          {creative.creative_name}
+                          {creative.name}
                           <button
                             onClick={() => setSelectedCreatives(prev => 
                               prev.filter(c => c.id !== creative.id)
@@ -1112,18 +1112,18 @@ export function NewAdDrawer({
                       
                       {/* Creative Preview */}
                       <div className="relative bg-muted flex items-center justify-center min-h-[200px]">
-                        {selectedCreatives.length > 0 && selectedCreatives[0].file_url ? (
+                        {selectedCreatives.length > 0 && (selectedCreatives[0].image_urls?.[0]) ? (
                           selectedCreatives[0].creative_type === 'Video' ? (
                             <video
-                              src={selectedCreatives[0].file_url}
+                              src={selectedCreatives[0].image_urls?.[0]}
                               className="w-full h-auto max-h-[400px] object-contain"
                               controls
                               loop
                             />
                           ) : (
                             <img
-                              src={selectedCreatives[0].file_url}
-                              alt={selectedCreatives[0].creative_name}
+                              src={selectedCreatives[0].image_urls?.[0]}
+                              alt={selectedCreatives[0].name}
                               className="w-full h-auto max-h-[400px] object-contain"
                             />
                           )

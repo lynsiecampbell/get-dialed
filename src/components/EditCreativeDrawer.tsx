@@ -12,15 +12,14 @@ import { showSuccess, showError } from "@/lib/toast-helpers";
 
 interface Creative {
   id: string;
-  creative_name: string;
+  name: string;
   campaign: string | null;
   notes: string | null;
   status: string;
   creative_group_type: string;
   parent_creative_id: string | null;
   creative_type: string;
-  file_url: string | null;
-  thumbnail_url: string | null;
+  image_urls: string[] | null;
   format_dimensions: string | null;
   file_size_mb: number | null;
   tags: string[];
@@ -54,7 +53,7 @@ export function EditCreativeDrawer({
   // Pre-fill form when creative changes
   useEffect(() => {
     if (open && creative && user) {
-      setCreativeName(creative.creative_name);
+      setCreativeName(creative.name);
       fetchCampaigns();
       fetchCreativeCampaigns();
     }
@@ -119,15 +118,14 @@ export function EditCreativeDrawer({
     setLoading(true);
     try {
       // Update creative name
-      const { error: updateError } = await supabase
+      const updateRes = await supabase
         .from("creatives")
         .update({
-          creative_name: creativeName.trim(),
+          name: creativeName.trim(),
           updated_at: new Date().toISOString()
         })
         .eq("id", creative.id);
-
-      if (updateError) throw updateError;
+      if (updateRes.error) throw updateRes.error;
 
       // Update campaign associations
       // First, remove all existing associations

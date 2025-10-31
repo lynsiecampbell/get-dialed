@@ -5,12 +5,11 @@ import { format } from "date-fns";
 
 type CreativeCardProps = {
   id: string;
-  creative_name: string;
+  name: string;
   campaign: string | null;
   creative_type: string;
   creative_group_type: string;
-  file_url: string | null;
-  thumbnail_url: string | null;
+  image_urls: string[] | null;
   updated_at: string;
   ad_count: number;
   onEdit: () => void;
@@ -20,12 +19,11 @@ type CreativeCardProps = {
 };
 
 export function CreativeCard({
-  creative_name,
+  name,
   campaign,
   creative_type,
   creative_group_type,
-  file_url,
-  thumbnail_url,
+  image_urls,
   updated_at,
   ad_count,
   onEdit,
@@ -34,21 +32,22 @@ export function CreativeCard({
   onViewAds,
 }: CreativeCardProps) {
   const isVideo = creative_type === "Video";
-  const imageUrl = thumbnail_url || file_url || "/placeholder.svg";
+  const primaryUrl = image_urls?.[0] || "";
+  const imageUrl = primaryUrl || "/placeholder.svg";
 
   return (
     <div className="group rounded-[5px] border bg-card p-4 shadow-sm hover:shadow-md transition-shadow">
       {/* Image/Video Preview */}
       <div className="relative aspect-[4/5] overflow-hidden rounded-[5px] bg-black group">
-        {isVideo && file_url ? (
+        {isVideo && primaryUrl ? (
           <>
             <video
-              src={file_url}
+              src={primaryUrl}
               muted
               playsInline
               loop
               preload="metadata"
-              poster={thumbnail_url || undefined}
+              poster={primaryUrl || undefined}
               className="h-full w-full object-contain bg-black transition-transform duration-200 group-hover:scale-[1.02]"
               onMouseEnter={(e) => (e.currentTarget as HTMLVideoElement).play().catch(() => {})}
               onMouseLeave={(e) => {
@@ -75,7 +74,7 @@ export function CreativeCard({
         ) : (
           <img
             src={imageUrl}
-            alt={creative_name}
+            alt={name}
             className="h-full w-full object-cover"
             onError={(e) => {
               e.currentTarget.src = "/placeholder.svg";
@@ -87,7 +86,7 @@ export function CreativeCard({
       {/* Creative Name - Fixed height container */}
       <div className="mt-3 h-[42px] flex items-start">
         <h3 className="text-[15px] font-medium leading-snug break-words line-clamp-2">
-          {creative_name}
+          {name}
         </h3>
       </div>
 

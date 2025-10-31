@@ -492,7 +492,7 @@ export function EditAdDrawer({
           </div>
 
           <div className="flex justify-end gap-2 pt-4">
-            <Button variant="outline" onClick={handleClose}>Cancel</Button>
+            <div />
             <Button onClick={handleNext}>
               Next <ArrowRight className="w-4 h-4 ml-2" />
             </Button>
@@ -624,7 +624,6 @@ export function EditAdDrawer({
               <ArrowLeft className="w-4 h-4 mr-2" /> Back
             </Button>
             <div className="flex gap-2">
-              <Button variant="outline" onClick={handleClose}>Cancel</Button>
               <Button onClick={handleSave} disabled={loading}>
                 {loading ? "Saving..." : "Save Changes"}
               </Button>

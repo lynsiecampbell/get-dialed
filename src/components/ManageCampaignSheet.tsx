@@ -23,7 +23,7 @@ interface Message {
 
 interface Creative {
   id: string;
-  creative_name: string;
+  name: string;
   campaign: string | null;
   status: string;
   creative_group_type: string;

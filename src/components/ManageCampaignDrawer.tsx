@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { DrawerPanel } from "@/components/ui/DrawerPanel";
+import { DrawerLarge } from "@/components/shared/DrawerLarge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -346,11 +346,13 @@ export function ManageCampaignDrawer({
   if (!campaign) return null;
 
   return (
-    <DrawerPanel
-      open={open}
-      onOpenChange={onOpenChange}
+    <DrawerLarge
+      isOpen={open}
+      onClose={() => onOpenChange(false)}
       title="Manage Campaign"
-      size="lg"
+      onSave={handleSave}
+      saveText={loading ? "Saving..." : "Save Changes"}
+      isLoading={loading}
     >
       <div className="space-y-6 p-6">
         {/* Campaign Details */}
@@ -763,15 +765,7 @@ export function ManageCampaignDrawer({
           </div>
         </div>
 
-        {/* Actions */}
-        <div className="flex justify-end gap-2 pt-4 border-t">
-          <Button variant="outline" onClick={() => onOpenChange(false)}>
-            Cancel
-          </Button>
-          <Button onClick={handleSave} disabled={loading}>
-            {loading ? "Saving..." : "Save Changes"}
-          </Button>
-        </div>
+        {/* Actions are handled by Drawer footer */}
       </div>
 
       {/* All the "New" drawers */}
@@ -848,6 +842,6 @@ export function ManageCampaignDrawer({
           />
         </>
       )}
-    </DrawerPanel>
+    </DrawerLarge>
   );
 }

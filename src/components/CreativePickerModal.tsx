@@ -12,11 +12,10 @@ import { Image as ImageIcon, Video, Grid3x3, Search, Filter } from 'lucide-react
 
 interface Creative {
   id: string;
-  creative_name: string;
+  name: string;
   creative_type: string;
   campaign: string | null;
-  thumbnail_url: string | null;
-  file_url: string | null;
+  image_urls: string[] | null;
   parent_creative_id: string | null;
   creative_group_type: string;
 }
@@ -76,7 +75,7 @@ export function CreativePickerModal({
   useEffect(() => {
     // Filter creatives based on all filters
     const filtered = creatives.filter(creative => {
-      const matchesSearch = creative.creative_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      const matchesSearch = creative.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
         creative.campaign?.toLowerCase().includes(searchQuery.toLowerCase());
       const matchesCampaign = campaignFilter === "all" || creative.campaign === campaignFilter;
       const matchesType = typeFilter === "all" || creative.creative_type === typeFilter;
@@ -286,11 +285,10 @@ export function CreativePickerModal({
 
                 {/* Image Preview */}
                 <div className="aspect-[4/5] bg-black relative overflow-hidden group">
-                  {creative.creative_type?.toLowerCase() === "video" && creative.file_url ? (
+                  {creative.creative_type?.toLowerCase() === "video" && (creative.image_urls?.[0]) ? (
                     <>
                       <video
-                        src={creative.file_url}
-                        poster={creative.thumbnail_url || undefined}
+                        src={creative.image_urls?.[0] || ""}
                         className="w-full h-full object-contain bg-black"
                         muted
                         playsInline
@@ -320,8 +318,8 @@ export function CreativePickerModal({
                     </>
                   ) : (
                     <img
-                      src={creative.thumbnail_url || creative.file_url || "/placeholder.svg"}
-                      alt={creative.creative_name}
+                      src={creative.image_urls?.[0] || "/placeholder.svg"}
+                      alt={creative.name}
                       className="w-full h-full object-cover"
                       onError={(e) => {
                         e.currentTarget.src = "/placeholder.svg";
@@ -333,7 +331,7 @@ export function CreativePickerModal({
                 {/* Card Content */}
                 <div className="p-3 bg-card space-y-2">
                   <p className="font-medium text-sm line-clamp-2 min-h-[40px]">
-                    {creative.creative_name}
+                    {creative.name}
                   </p>
                   
                   {creative.campaign && (
