@@ -818,7 +818,6 @@ export function ManageCampaignDrawer({
               setShowCreativeDrawer(false);
               fetchAssets();
             }}
-            campaignId={campaign.id}
           />
 
           <NewLandingPageDrawer
@@ -828,7 +827,6 @@ export function ManageCampaignDrawer({
               setShowLandingPageDrawer(false);
               fetchAssets();
             }}
-            campaignId={campaign.id}
           />
 
           <NewAdDrawer
@@ -838,7 +836,6 @@ export function ManageCampaignDrawer({
               setShowAdDrawer(false);
               fetchAssets();
             }}
-            campaignId={campaign.id}
           />
         </>
       )}

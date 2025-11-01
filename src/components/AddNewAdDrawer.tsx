@@ -13,7 +13,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
 import { X, ArrowLeft, ArrowRight, Image as ImageIcon, Plus, CalendarIcon } from "lucide-react";
 import { CreativePickerModal } from "./CreativePickerModal";
-import { AddNewCreativeDrawer } from "./AddNewCreativeDrawer";
+import { NewCreativeDrawer } from "./NewCreativeDrawer";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 import { buildUTMUrl } from "@/lib/utm-helpers";
@@ -1429,7 +1429,7 @@ export function AddNewAdDrawer({
         allowMultiple={true}
       />
 
-      <AddNewCreativeDrawer
+      <NewCreativeDrawer
         open={showCreateCreative}
         onClose={() => setShowCreateCreative(false)}
         onSuccess={async () => {

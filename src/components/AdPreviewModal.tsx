@@ -73,7 +73,7 @@ export function AdPreviewModal({
                 ) : (
                   <img
                     src={imageUrl}
-                    alt={creative.creative_name}
+                    alt={creative.name}
                     className="h-full w-full object-cover"
                   />
                 )
@@ -86,7 +86,7 @@ export function AdPreviewModal({
 
             {creative && (
               <div className="text-sm text-muted-foreground">
-                <p className="font-medium text-foreground">{creative.creative_name}</p>
+                <p className="font-medium text-foreground">{creative.name}</p>
                 <p className="capitalize">{creative.creative_type}</p>
               </div>
             )}

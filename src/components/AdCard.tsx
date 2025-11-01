@@ -101,7 +101,7 @@ export function AdCard({
             ) : (
               <img
                 src={imageUrl}
-                alt={primaryCreative.creative_name}
+                alt={primaryCreative.name}
                 className="h-full w-full object-cover"
                 onError={(e) => {
                   e.currentTarget.src = "/placeholder.svg";

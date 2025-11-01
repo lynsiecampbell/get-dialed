@@ -131,7 +131,6 @@ export function CampaignCard({
                 type="creative"
                 count={assets.creatives}
                 size="sm"
-                variant="outlined"
                 onClick={(e) => {
                   e.stopPropagation();
                   onViewCreatives();
@@ -143,7 +142,6 @@ export function CampaignCard({
                 type="landing-page"
                 count={assets.landingPages}
                 size="sm"
-                variant="outlined"
                 onClick={(e) => {
                   e.stopPropagation();
                   onViewLandingPages();
@@ -155,7 +153,6 @@ export function CampaignCard({
                 type="ad"
                 count={assets.ads}
                 size="sm"
-                variant="outlined"
                 onClick={(e) => {
                   e.stopPropagation();
                   onViewAds();
@@ -183,7 +180,6 @@ export function CampaignCard({
                 type="brand"
                 count={brandCount}
                 size="sm"
-                variant="outlined"
               />
             )}
             {emailCount > 0 && (
@@ -191,7 +187,6 @@ export function CampaignCard({
                 type="email"
                 count={emailCount}
                 size="sm"
-                variant="outlined"
               />
             )}
             {adCount > 0 && (
@@ -199,7 +194,6 @@ export function CampaignCard({
                 type="ad-copy"
                 count={adCount}
                 size="sm"
-                variant="outlined"
               />
             )}
             {socialCount > 0 && (
@@ -207,7 +201,6 @@ export function CampaignCard({
                 type="social"
                 count={socialCount}
                 size="sm"
-                variant="outlined"
               />
             )}
           </div>

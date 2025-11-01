@@ -633,9 +633,9 @@ export function EditAdDrawer({
       )}
 
       {/* Modals */}
-      <CreativePickerModal
-        open={showCreativePicker}
-        onClose={() => setShowCreativePicker(false)}
+        <CreativePickerModal
+          open={showCreativePicker}
+          onOpenChange={setShowCreativePicker}
         onSelect={(creatives) => {
           setSelectedCreatives(creatives);
           setShowCreativePicker(false);
