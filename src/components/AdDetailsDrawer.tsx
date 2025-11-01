@@ -60,7 +60,7 @@ export function AdDetailsDrawer({
   return (
     <DrawerPanel
       open={open}
-      onOpenChange={onOpenChange}
+      onClose={() => onOpenChange(false)}
       title="Ad Details"
     >
       <div className="space-y-6">

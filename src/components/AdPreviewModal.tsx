@@ -201,19 +201,14 @@ export function AdPreviewModal({
                   </h3>
                   <div className="flex items-center gap-2">
                     <span className="text-sm">{ad.landing_page.name}</span>
-                    <Button
-                      size="sm"
-                      variant="ghost"
-                      asChild
+                    <a
+                      href={ad.landing_page.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center justify-center h-8 w-8 rounded-sm hover:bg-accent hover:text-accent-foreground transition-colors"
                     >
-                      
-                        href={ad.landing_page.url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                      >
-                        <ExternalLink className="h-3.5 w-3.5" />
-                      </a>
-                    </Button>
+                      <ExternalLink className="h-3.5 w-3.5" />
+                    </a>
                   </div>
                 </div>
               </>
